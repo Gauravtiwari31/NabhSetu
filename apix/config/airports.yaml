@@ -1,0 +1,27 @@
+# Reference geography. Source: OurAirports / OpenFlights (open datasets).
+# Used for the great-circle plausibility gate and for fare-per-km normalisation.
+airports:
+  DEL: {city: "Delhi",       name: "Indira Gandhi Intl",        lat: 28.5562, lon: 77.1000}
+  BOM: {city: "Mumbai",      name: "Chhatrapati Shivaji Maharaj", lat: 19.0887, lon: 72.8679}
+  BLR: {city: "Bengaluru",   name: "Kempegowda Intl",           lat: 13.1979, lon: 77.7063}
+  MAA: {city: "Chennai",     name: "Chennai Intl",              lat: 12.9941, lon: 80.1709}
+  CCU: {city: "Kolkata",     name: "Netaji Subhas Chandra Bose", lat: 22.6547, lon: 88.4467}
+  HYD: {city: "Hyderabad",   name: "Rajiv Gandhi Intl",         lat: 17.2403, lon: 78.4294}
+  GOI: {city: "Goa",         name: "Dabolim",                   lat: 15.3808, lon: 73.8314}
+  AMD: {city: "Ahmedabad",   name: "Sardar Vallabhbhai Patel",  lat: 23.0772, lon: 72.6347}
+  PNQ: {city: "Pune",        name: "Pune",                      lat: 18.5821, lon: 73.9197}
+  COK: {city: "Kochi",       name: "Cochin Intl",               lat: 10.1520, lon: 76.4019}
+  LKO: {city: "Lucknow",     name: "Chaudhary Charan Singh",    lat: 26.7606, lon: 80.8893}
+  GAU: {city: "Guwahati",    name: "Lokpriya Gopinath Bordoloi", lat: 26.1061, lon: 91.5859}
+  BBI: {city: "Bhubaneswar", name: "Biju Patnaik Intl",         lat: 20.2444, lon: 85.8178}
+  PAT: {city: "Patna",       name: "Jay Prakash Narayan",       lat: 25.5913, lon: 85.0880}
+  IDR: {city: "Indore",      name: "Devi Ahilyabai Holkar",     lat: 22.7218, lon: 75.8011}
+  CJB: {city: "Coimbatore",  name: "Coimbatore Intl",           lat: 11.0300, lon: 77.0434}
+  VTZ: {city: "Visakhapatnam", name: "Visakhapatnam",           lat: 17.7211, lon: 83.2245}
+  JAI: {city: "Jaipur",      name: "Jaipur Intl",               lat: 26.8242, lon: 75.8122}
+  IXC: {city: "Chandigarh",  name: "Chandigarh",                lat: 30.6735, lon: 76.7885}
+  SXR: {city: "Srinagar",    name: "Sheikh ul-Alam Intl",       lat: 33.9871, lon: 74.7742}
+  IXL: {city: "Leh",         name: "Kushok Bakula Rimpochee",   lat: 34.1359, lon: 77.5465}
+  IXA: {city: "Agartala",    name: "Maharaja Bir Bikram",       lat: 23.8869, lon: 91.2404}
+  DED: {city: "Dehradun",    name: "Jolly Grant",               lat: 30.1897, lon: 78.1803}
+  SAG: {city: "Shivamogga",  name: "Shivamogga",                lat: 13.8536, lon: 75.6531}

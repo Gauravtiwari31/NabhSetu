@@ -1,0 +1,295 @@
+{
+  "generated_at_utc": "2026-08-23T20:56:22.449453+00:00",
+  "python": "3.10.11",
+  "platform": "Windows 10",
+  "pytest": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" -m pytest -o addopts=\"\" -q --durations=15 --tb=short",
+    "rc": 0,
+    "stdout": "........................................................................ [ 61%]\n.............................................                            [100%]\n============================ slowest 15 durations =============================\n5.76s setup    tests/test_end_to_end.py::test_quotes_landed\n1.12s call     tests/test_end_to_end.py::test_recomputation_is_bit_identical\n0.91s call     tests/test_elasticity.py::test_fare_ladder_recovers_a_known_number_of_buckets\n0.51s call     tests/test_end_to_end.py::test_api_serves_the_published_index\n0.37s call     tests/test_end_to_end.py::test_publication_is_blocked_when_the_chain_is_broken\n0.33s call     tests/test_end_to_end.py::test_collection_is_idempotent\n0.14s call     tests/test_index_math.py::test_effective_weights_equal_the_staged_aggregation\n0.11s call     tests/test_index_math.py::test_engine_is_deterministic\n0.11s call     tests/test_index_math.py::test_booking_and_travel_basis_differ_by_the_lead_time_lag\n0.11s call     tests/test_elasticity.py::test_recovers_a_different_trough\n0.10s setup    tests/test_pipeline_and_governance.py::test_decomposition_reconciles_to_within_one_rupee\n0.10s setup    tests/test_pipeline_and_governance.py::test_non_winsorised_rows_are_untouched_by_the_cap_path\n0.10s setup    tests/test_pipeline_and_governance.py::test_gst_is_ad_valorem_on_the_fare_base\n0.10s setup    tests/test_pipeline_and_governance.py::test_outliers_are_winsorised_not_deleted\n0.10s setup    tests/test_pipeline_and_governance.py::test_ledger_chain_verifies\n117 passed in 14.74s\n",
+    "stderr": "",
+    "seconds": 15.4
+  },
+  "pytest_collect": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" -m pytest -o addopts=\"\" --collect-only -q",
+    "rc": 0,
+    "stdout": "tests/test_elasticity.py::test_recovers_a_known_tau_star\ntests/test_elasticity.py::test_recovers_a_known_curvature\ntests/test_elasticity.py::test_recovers_a_different_trough\ntests/test_elasticity.py::test_eta_has_the_right_shape_and_sign\ntests/test_elasticity.py::test_eta_is_monotone_increasing_in_tau\ntests/test_elasticity.py::test_eta_matches_its_closed_form\ntests/test_elasticity.py::test_tau_star_matches_its_closed_form\ntests/test_elasticity.py::test_declines_when_there_is_no_interior_minimum\ntests/test_elasticity.py::test_rejects_too_small_a_sample\ntests/test_elasticity.py::test_drops_nonpositive_prices_rather_than_taking_log_of_them\ntests/test_elasticity.py::test_standard_errors_are_clustered_by_flight\ntests/test_elasticity.py::test_r_squared_is_sane\ntests/test_elasticity.py::test_per_route_fit_drops_the_route_fixed_effect\ntests/test_elasticity.py::test_fit_is_deterministic\ntests/test_elasticity.py::test_holiday_regressor_is_included_when_supplied\ntests/test_elasticity.py::test_surface_returns_a_band_per_window\ntests/test_elasticity.py::test_fare_ladder_recovers_a_known_number_of_buckets\ntests/test_elasticity.py::test_fare_ladder_declines_on_a_thin_sample\ntests/test_elasticity.py::test_fare_ladder_weights_sum_to_one\ntests/test_end_to_end.py::test_quotes_landed\ntests/test_end_to_end.py::test_every_quote_carries_a_resolvable_legal_basis\ntests/test_end_to_end.py::test_hash_chain_intact_after_a_full_run\ntests/test_end_to_end.py::test_index_published_with_versions_stamped\ntests/test_end_to_end.py::test_base_period_is_exactly_100\ntests/test_end_to_end.py::test_recomputation_is_bit_identical\ntests/test_end_to_end.py::test_collection_is_idempotent\ntests/test_end_to_end.py::test_quality_contract_ran_and_was_recorded\ntests/test_end_to_end.py::test_publication_is_blocked_when_the_chain_is_broken\ntests/test_end_to_end.py::test_api_serves_the_published_index\ntests/test_end_to_end.py::test_availability_series_is_persisted_and_served\ntests/test_index_math.py::test_jevons_hand_computed\ntests/test_index_math.py::test_jevons_uniform_price_change\ntests/test_index_math.py::test_am_gm_ordering_dutot_jevons_carli\ntests/test_index_math.py::test_jevons_satisfies_time_reversal\ntests/test_index_math.py::test_carli_fails_time_reversal_upward_bias\ntests/test_index_math.py::test_jevons_transitivity\ntests/test_index_math.py::test_jevons_rejects_bad_input\ntests/test_index_math.py::test_jevons_se_matches_delta_method\ntests/test_index_math.py::test_blend_reduces_to_matched_when_fully_available\ntests/test_index_math.py::test_blend_converges_to_laf_when_nothing_available\ntests/test_index_math.py::test_blend_is_monotone_and_continuous_in_a\ntests/test_index_math.py::test_blend_is_geometric_at_the_midpoint\ntests/test_index_math.py::test_availability_ratio_clamps\ntests/test_index_math.py::test_availability_adjustment_catches_a_surge_a_matched_index_misses\ntests/test_index_math.py::test_seven_day_centred_gm_annihilates_a_weekly_cycle_exactly\ntests/test_index_math.py::test_geometric_mean_matches_definition\ntests/test_index_math.py::test_apw_aggregation_renormalises_over_present_windows\ntests/test_index_math.py::test_suppressed_cell_weight_is_redistributed_pro_rata\ntests/test_index_math.py::test_weights_are_injectable_and_change_the_answer\ntests/test_index_math.py::test_booking_and_travel_basis_differ_by_the_lead_time_lag\ntests/test_index_math.py::test_bootstrap_is_deterministic_given_the_seed\ntests/test_index_math.py::test_bootstrap_interval_brackets_the_point_estimate\ntests/test_index_math.py::test_engine_ci_brackets_published_value\ntests/test_index_math.py::test_engine_is_deterministic\ntests/test_index_math.py::test_excluded_quotes_do_not_reach_the_index\ntests/test_index_math.py::test_effective_weights_equal_the_staged_aggregation\ntests/test_index_math.py::test_prepare_returns_the_same_columns_on_both_paths\ntests/test_index_math.py::test_a_route_entering_after_the_base_period_is_reported_not_hidden\ntests/test_pipeline_and_governance.py::test_decomposition_reconciles_to_within_one_rupee\ntests/test_pipeline_and_governance.py::test_gst_is_ad_valorem_on_the_fare_base\ntests/test_pipeline_and_governance.py::test_variants_are_ordered_B_le_T_le_A\ntests/test_pipeline_and_governance.py::test_convenience_fee_is_excluded_from_the_headline\ntests/test_pipeline_and_governance.py::test_administered_charges_are_effective_dated\ntests/test_pipeline_and_governance.py::test_hard_gates_exclude_impossible_quotes\ntests/test_pipeline_and_governance.py::test_outliers_are_winsorised_not_deleted\ntests/test_pipeline_and_governance.py::test_flag_and_disposition_are_separate_columns\ntests/test_pipeline_and_governance.py::test_sold_out_is_quarantined_not_excluded\ntests/test_pipeline_and_governance.py::test_tukey_multiplier_is_three_not_one_point_five\ntests/test_pipeline_and_governance.py::test_ledger_chain_verifies\ntests/test_pipeline_and_governance.py::test_ledger_detects_tampering\ntests/test_pipeline_and_governance.py::test_ledger_rejects_updates_and_deletes\ntests/test_pipeline_and_governance.py::test_quotes_are_immutable\ntests/test_pipeline_and_governance.py::test_robots_blocked_requests_are_recorded_not_silently_skipped\ntests/test_pipeline_and_governance.py::test_governor_never_issues_a_disallowed_request\ntests/test_pipeline_and_governance.py::test_governor_allows_a_permitted_path\ntests/test_pipeline_and_governance.py::test_unreadable_robots_fails_closed\ntests/test_pipeline_and_governance.py::test_kill_switch_disables_a_host_instantly\ntests/test_pipeline_and_governance.py::test_circuit_breaker_opens_after_three_hard_blocks\ntests/test_pipeline_and_governance.py::test_hard_block_never_retries\ntests/test_pipeline_and_governance.py::test_concurrency_ceiling_is_one\ntests/test_pipeline_and_governance.py::test_token_bucket_enforces_the_declared_crawl_delay\ntests/test_pipeline_and_governance.py::test_circuit_breaker_reopens_after_cooldown\ntests/test_pipeline_and_governance.py::test_no_circumvention_code_exists_anywhere_in_the_package\ntests/test_pipeline_and_governance.py::test_quality_contract_blocks_on_arithmetic_failure\ntests/test_pipeline_and_governance.py::test_quality_contract_passes_on_clean_data\ntests/test_pipeline_and_governance.py::test_quality_contract_blocks_on_duplicate_kappa\ntests/test_pipeline_and_governance.py::test_carrier_weights_reproduce_published_market_shares\ntests/test_pipeline_and_governance.py::test_psd_supplied_weights_override_derived_ones\ntests/test_pipeline_and_governance.py::test_winsorised_cap_survives_the_store_round_trip\ntests/test_pipeline_and_governance.py::test_non_winsorised_rows_are_untouched_by_the_cap_path\ntests/test_pipeline_and_governance.py::test_attach_variant_prices_works_without_the_capped_column\ntests/test_pipeline_and_governance.py::test_migration_adds_the_capped_column_to_an_existing_store\ntests/test_reference_and_models.py::test_month_names_and_numbers_both_parse\ntests/test_reference_and_models.py::test_tidy_takes_the_deepest_populated_level\ntests/test_reference_and_models.py::test_tidy_rejects_a_frame_with_no_classification\ntests/test_reference_and_models.py::test_find_air_fare_item_reports_absence_rather_than_substituting\ntests/test_reference_and_models.py::test_backtest_refuses_below_the_minimum_overlap\ntests/test_reference_and_models.py::test_backtest_refuses_when_there_is_no_overlap_at_all\ntests/test_reference_and_models.py::test_backtest_flags_a_non_item_comparator\ntests/test_reference_and_models.py::test_backtest_flags_synthetic_input_as_non_validating\ntests/test_reference_and_models.py::test_backtest_recovers_a_known_relationship\ntests/test_reference_and_models.py::test_backtest_reports_no_relationship_when_there_is_none\ntests/test_reference_and_models.py::test_bland_altman_identity\ntests/test_reference_and_models.py::test_directional_agreement_perfect_and_opposite\ntests/test_reference_and_models.py::test_backtest_persists_results\ntests/test_reference_and_models.py::test_nowcast_refuses_on_too_few_observations\ntests/test_reference_and_models.py::test_nowcast_refuses_on_synthetic_input_even_with_plenty_of_data\ntests/test_reference_and_models.py::test_nowcast_is_interpretable_on_a_long_real_looking_sample\ntests/test_reference_and_models.py::test_nowcast_handles_an_empty_overlap_without_crashing\ntests/test_reference_and_models.py::test_target_is_yoy_log_inflation\ntests/test_reference_and_models.py::test_oos_evaluation_is_expanding_window_not_random\ntests/test_reference_and_models.py::test_oos_declines_when_the_sample_is_too_short\ntests/test_reference_and_models.py::test_granger_declines_on_a_short_sample\ntests/test_reference_and_models.py::test_granger_runs_on_a_long_sample\ntests/test_reference_and_models.py::test_records_converts_nan_and_inf_to_null\ntests/test_reference_and_models.py::test_records_leaves_a_fully_populated_frame_intact\ntests/test_reference_and_models.py::test_backtest_aligned_payload_is_json_serialisable\n\n117 tests collected in 0.56s\n",
+    "stderr": "",
+    "seconds": 1.08
+  },
+  "coverage_report": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" -m coverage report --precision=1",
+    "rc": 0,
+    "stdout": "Name                                    Stmts   Miss  Cover\n-----------------------------------------------------------\nsrc\\apix_api\\__init__.py                    0      0 100.0%\nsrc\\apix_api\\main.py                      192     78  59.4%\nsrc\\apix_collect\\__init__.py                0      0 100.0%\nsrc\\apix_collect\\politeness.py            138     14  89.9%\nsrc\\apix_collect\\provenance.py             46      1  97.8%\nsrc\\apix_collect\\runner.py                116     31  73.3%\nsrc\\apix_collect\\sources\\__init__.py        0      0 100.0%\nsrc\\apix_collect\\sources\\synthetic.py     104      1  99.0%\nsrc\\apix_index\\__init__.py                  9      0 100.0%\nsrc\\apix_index\\aggregate.py                56      4  92.9%\nsrc\\apix_index\\availability.py             16      2  87.5%\nsrc\\apix_index\\elementary.py               42      3  92.9%\nsrc\\apix_index\\engine.py                  200      9  95.5%\nsrc\\apix_index\\smoothing.py                16      1  93.8%\nsrc\\apix_index\\types.py                    67      5  92.5%\nsrc\\apix_index\\uncertainty.py              34      5  85.3%\nsrc\\apix_pipeline\\__init__.py               0      0 100.0%\nsrc\\apix_pipeline\\backtest.py             104      5  95.2%\nsrc\\apix_pipeline\\clean.py                105      3  97.1%\nsrc\\apix_pipeline\\decompose.py             62      7  88.7%\nsrc\\apix_pipeline\\elasticity.py           130      6  95.4%\nsrc\\apix_pipeline\\nowcast.py              133     14  89.5%\nsrc\\apix_pipeline\\quality.py               78      9  88.5%\nsrc\\apix_pipeline\\run_index.py            105      1  99.0%\nsrc\\apix_reference\\__init__.py              0      0 100.0%\nsrc\\apix_reference\\cpi.py                  89     33  62.9%\nsrc\\apix_store\\__init__.py                  0      0 100.0%\nsrc\\apix_store\\db.py                      143      3  97.9%\n-----------------------------------------------------------\nTOTAL                                    1985    235  88.2%\n",
+    "stderr": "",
+    "seconds": 0.38
+  },
+  "coverage": {
+    "total_pct": 88.16120906801008,
+    "statements": 1985,
+    "missing": 235,
+    "files": {
+      "src/apix_api/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_api/main.py": {
+        "pct": 59.375,
+        "statements": 192,
+        "missing": 78
+      },
+      "src/apix_collect/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_collect/politeness.py": {
+        "pct": 89.85507246376811,
+        "statements": 138,
+        "missing": 14
+      },
+      "src/apix_collect/provenance.py": {
+        "pct": 97.82608695652173,
+        "statements": 46,
+        "missing": 1
+      },
+      "src/apix_collect/runner.py": {
+        "pct": 73.27586206896552,
+        "statements": 116,
+        "missing": 31
+      },
+      "src/apix_collect/sources/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_collect/sources/synthetic.py": {
+        "pct": 99.03846153846153,
+        "statements": 104,
+        "missing": 1
+      },
+      "src/apix_index/__init__.py": {
+        "pct": 100.0,
+        "statements": 9,
+        "missing": 0
+      },
+      "src/apix_index/aggregate.py": {
+        "pct": 92.85714285714286,
+        "statements": 56,
+        "missing": 4
+      },
+      "src/apix_index/availability.py": {
+        "pct": 87.5,
+        "statements": 16,
+        "missing": 2
+      },
+      "src/apix_index/elementary.py": {
+        "pct": 92.85714285714286,
+        "statements": 42,
+        "missing": 3
+      },
+      "src/apix_index/engine.py": {
+        "pct": 95.5,
+        "statements": 200,
+        "missing": 9
+      },
+      "src/apix_index/smoothing.py": {
+        "pct": 93.75,
+        "statements": 16,
+        "missing": 1
+      },
+      "src/apix_index/types.py": {
+        "pct": 92.53731343283582,
+        "statements": 67,
+        "missing": 5
+      },
+      "src/apix_index/uncertainty.py": {
+        "pct": 85.29411764705883,
+        "statements": 34,
+        "missing": 5
+      },
+      "src/apix_pipeline/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_pipeline/backtest.py": {
+        "pct": 95.1923076923077,
+        "statements": 104,
+        "missing": 5
+      },
+      "src/apix_pipeline/clean.py": {
+        "pct": 97.14285714285714,
+        "statements": 105,
+        "missing": 3
+      },
+      "src/apix_pipeline/decompose.py": {
+        "pct": 88.70967741935483,
+        "statements": 62,
+        "missing": 7
+      },
+      "src/apix_pipeline/elasticity.py": {
+        "pct": 95.38461538461539,
+        "statements": 130,
+        "missing": 6
+      },
+      "src/apix_pipeline/nowcast.py": {
+        "pct": 89.47368421052632,
+        "statements": 133,
+        "missing": 14
+      },
+      "src/apix_pipeline/quality.py": {
+        "pct": 88.46153846153847,
+        "statements": 78,
+        "missing": 9
+      },
+      "src/apix_pipeline/run_index.py": {
+        "pct": 99.04761904761905,
+        "statements": 105,
+        "missing": 1
+      },
+      "src/apix_reference/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_reference/cpi.py": {
+        "pct": 62.92134831460674,
+        "statements": 89,
+        "missing": 33
+      },
+      "src/apix_store/__init__.py": {
+        "pct": 100.0,
+        "statements": 0,
+        "missing": 0
+      },
+      "src/apix_store/db.py": {
+        "pct": 97.9020979020979,
+        "statements": 143,
+        "missing": 3
+      }
+    }
+  },
+  "ruff_stats": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" -m ruff check src tests cli.py --statistics",
+    "rc": 1,
+    "stdout": "108\tUP006  \t[*] non-pep585-annotation\n 50\tUP045  \t[*] non-pep604-annotation-optional\n 41\tUP035  \t[-] deprecated-import\n 19\tC408   \t[ ] unnecessary-collection-call\n 13\tB008   \t[ ] function-call-in-default-argument\n 11\tF401   \t[*] unused-import\n 11\tRUF100 \t[*] unused-noqa\n 10\tI001   \t[*] unsorted-imports\n  5\tBLE001 \t[ ] blind-except\n  5\tRUF046 \t[-] unnecessary-cast-to-int\n  2\tDTZ011 \t[ ] call-date-today\n  2\tISC004 \t[ ] implicit-string-concatenation-in-collection-literal\n  1\tC401   \t[ ] unnecessary-generator-set\n  1\tFLY002 \t[ ] static-join-to-f-string\n  1\tPERF102\t[ ] incorrect-dict-iterator\n  1\tRUF022 \t[*] unsorted-dunder-all\nFound 281 errors.\n[*] 203 fixable with the `--fix` option (25 hidden fixes can be enabled with the `--unsafe-fixes` option).\n",
+    "stderr": "",
+    "seconds": 0.27
+  },
+  "ruff_serious": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" -m ruff check src tests cli.py --select PLR0124,F841,ISC004,F821,E9,B006 --output-format concise",
+    "rc": 1,
+    "stdout": "src\\apix_pipeline\\nowcast.py:67:18: ISC004 Unparenthesized implicit string concatenation in collection\nsrc\\apix_pipeline\\nowcast.py:146:28: ISC004 Unparenthesized implicit string concatenation in collection\nFound 2 errors.\nNo fixes available (2 hidden fixes can be enabled with the `--unsafe-fixes` option).\n",
+    "stderr": "",
+    "seconds": 0.11
+  },
+  "verify": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" cli.py verify",
+    "rc": 0,
+    "stdout": "provenance hash chain\n  records      1200\n  intact       True\n  tip          29e2ba8f2ac78d2b8b6ef74641509eba...\n\ndata quality contract\n  [PASS] BLOCK      schema          required_columns_present\n  [PASS] BLOCK      schema          disposition_domain\n  [PASS] BLOCK      schema          cabin_domain\n  [PASS] BLOCK      range           0_lt_base_lt_total\n  [PASS] BLOCK      arithmetic      components_resum_to_total\n  [PASS] BLOCK      uniqueness      no_duplicate_kappa_t_source\n  [warn] ALERT      freshness       every_basket_route_quoted_today   observed=48\n  [warn] ALERT      completeness    cell_fill_rate   observed=32\n  [PASS] QUARANTINE distributional  cell_median_within_4_sigma\n  [PASS] BLOCK      referential     provenance_hash_chain_intact\n  [PASS] BLOCK      referential     every_provenance_id_resolves\n  [PASS] ALERT      cross_source    same_flight_within_5pct\n\n  10/12 passed\n",
+    "stderr": "",
+    "seconds": 21.95
+  },
+  "status": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" cli.py status",
+    "rc": 0,
+    "stdout": "database: C:\\new\\Projects\\SmashKarts\\apix\\data\\apix.db\n  dim_route                      60\n  dim_carrier                     4\n  dim_source                      5\n  fact_fare_quote           1727360\n  fact_index_value            23823\n  ledger_provenance            1200\n  quality_check_result           24\n  quote history            2025-12-04 .. 2026-07-31\n  routes with quotes       12 of 60 in basket (20.0% by count)\n",
+    "stderr": "",
+    "seconds": 0.44
+  },
+  "backtest": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" cli.py backtest",
+    "rc": 0,
+    "stdout": "back-test: APIx-T (travel basis)  vs  CPI-2024 Transport (All India, Combined)\n  APIx span       ['2025-12-01', '2026-08-01']\n  comparator span ['2025-01-01', '2026-07-01']\n  overlapping months: 8\n\n  CAVEAT: Comparator is the Transport aggregate, not the air fare item. Transport also contains road fuel, vehicle purchase, rail fares and communication, and air fare is a small slice of it, so agreement is diluted by construction. A weak correlation here is expected and is NOT evidence that APIx is wrong.\n\n  CAVEAT: APIx side is SYNTHETIC. These statistics describe the simulator's relationship to real CPI, which is not a meaningful quantity. They verify that the harness computes, nothing more. Do not present them as validation.\n\n  agreement statistics:\n    pearson_r_level                        0.8845\n    spearman_rho_level                     1.0000\n    pearson_r_mom_change                   0.4474\n    spearman_rho_mom_change                0.5000\n    bland_altman_bias                      0.0781\n    bland_altman_sd_diff                   1.2487\n    bland_altman_loa_low                  -2.3693\n    bland_altman_loa_high                  2.5256\n    bland_altman_mean_abs_diff             0.9587\n    directional_agreement_pct            100.0000\n    n_moves                                7.0000\n    rmse_model                             0.9613\n    rmse_random_walk                       1.2549\n    skill_vs_rw_pct                       23.3992\n\n  strongest cross-correlation at lag -2 months (r=0.9276, n=6)\n   (positive lag = APIx moves first)\n",
+    "stderr": "",
+    "seconds": 0.72
+  },
+  "nowcast": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" cli.py nowcast",
+    "rc": 0,
+    "stdout": "CPI transport nowcast bridge  (base 2024, travel basis)\n  target: cpi_infl (y-o-y log %)\n  regressors: ['apix_g_l0', 'apix_g_l1', 'cpi_infl_l1']\n\nn=6  params=4  R2=0.9353 adj=0.8382\ninterpretable: False\n  ! only 6 usable observations (need >= 24). The CPI 2024 series begins in 2025 and y-o-y inflation costs a further 12 months, so a defensible bridge is not estimable from it yet. Coefficients are NOT reportable.\n  ! 6 observations for 4 parameters (< 8 per parameter). R^2 here is an artefact of the parameter count, not fit quality.\n  ! the APIx regressor is SYNTHETIC. This estimates the relationship between real CPI inflation and a simulator, which is not a meaningful quantity. The fit verifies the harness computes; it validates nothing.\n  const                -14.06941  (se 5.82750, t -2.41)\n  apix_g_l0            +16.64902  (se 7.78478, t +2.14)\n  apix_g_l1            +13.51567  (se 5.77323, t +2.34)\n  cpi_infl_l1          +0.92250  (se 0.23145, t +3.99)\n\n  out-of-sample (expanding window, never a random split):\n    n_oos: 0\n    note: need 18 observations for an expanding-window evaluation, have 6; no out-of-sample result\n\n  Granger causality (APIx -> CPI transport):\n    testable: False\n    n: 4\n    note: only 4 observations for 5 parameters; the test has effectively no power. Non-rejection would mean 'cannot tell', not 'no relationship'.\n\n  ==> COEFFICIENTS ARE NOT REPORTABLE. See the reasons above.\n      The harness is correct and will produce a real answer as soon as\n      enough real (non-synthetic) history exists.\n",
+    "stderr": "",
+    "seconds": 0.68
+  },
+  "elasticity": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" cli.py elasticity --route DEL-BOM",
+    "rc": 0,
+    "stdout": "lead-time elasticity surface -- DEL-BOM\n  n_obs 143808   clusters(flights) 24   params 21\n  b1 (ln tau)     -0.56993  (cluster SE 0.00034)\n  b2 (ln tau)^2   +0.08667  (cluster SE 0.00008)\n  R^2 0.5758   adj 0.5757\n\n  tau* = 26.8 days  95% CI [26.7, 26.9]\n  -> cheapest time to book DEL-BOM is about 27 days out\n\n  eta(tau):\n    tau= 1  eta=-0.5699\n    tau= 7  eta=-0.2326\n    tau=15  eta=-0.1005\n    tau=30  eta=+0.0197\n    tau=45  eta=+0.0899\n",
+    "stderr": "",
+    "seconds": 19.57
+  },
+  "engine_validation": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" tools/validate_engine.py",
+    "rc": 0,
+    "stdout": "periods compared      12\nquotes                2120\navailability exercised: min A across cells = 0.667\nmax abs difference    0.000e+00\nVERDICT               IDENTICAL\n",
+    "stderr": "",
+    "seconds": 1.76
+  },
+  "api_sweep": {
+    "cmd": "\"C:\\Users\\Gaurav Tiwari\\AppData\\Local\\Programs\\Python\\Python310\\python.exe\" tools/api_sweep.py",
+    "rc": 0,
+    "stdout": "200        75B  /health\n200     29613B  /dashboard/\n200       971B  /docs\n200     11257B  /openapi.json\n200     80463B  /v1/index?frequency=daily\n200     10772B  /v1/index?frequency=weekly\n200      2858B  /v1/index?frequency=monthly\n200     70642B  /v1/index?variant=B\n200     70637B  /v1/index?variant=A\n200     79935B  /v1/index?basis=travel\n200     70682B  /v1/index?omega_preset=leisure_tilted\n200      1121B  /v1/index?format=csv&frequency=monthly\n200      1933B  /v1/index?format=sdmx-json&frequency=monthly\n200     24473B  /v1/index/apw/7\n200     24283B  /v1/index/apw/45\n200     24406B  /v1/index/routes/DEL-BOM?apw_days=7\n200      1062B  /v1/elasticity\n200      1040B  /v1/elasticity?route=DEL-BOM\n200     49959B  /v1/components\n200     29197B  /v1/availability\n200     28948B  /v1/availability?route=DEL-BOM\n200     53459B  /v1/availability/series?route=DEL-BOM&apw_days=7\n200      2231B  /v1/backtest\n200      1033B  /v1/backtest?base_year=2012\n200      2250B  /v1/backtest?basis=book\n200      1214B  /v1/cpi?base_year=2024\n200      8482B  /v1/cpi?base_year=2012\n200      3620B  /v1/coverage\n200      2881B  /v1/methodology\n\nnegative cases (must not 500):\n404  /v1/index/routes/ZZZ-YYY  -> OK\n404  /v1/provenance/not-a-real-id  -> OK\n404  /v1/index/apw/999  -> OK\n422  /v1/index?variant=Q  -> OK\n\nprovenance round trip: 200  chain_intact=True  quotes=7200\n\nTOTAL  ok=34  fail=0\n",
+    "stderr": "",
+    "seconds": 56.73
+  },
+  "store": {
+    "audit_config_change": 0,
+    "dim_carrier": 4,
+    "dim_date": 801,
+    "dim_route": 60,
+    "dim_source": 5,
+    "fact_backtest_result": 42,
+    "fact_cell_index": 115200,
+    "fact_cpi_reference": 387743,
+    "fact_cross_source_spread": 0,
+    "fact_fare_quote": 1727360,
+    "fact_index_value": 23823,
+    "ledger_provenance": 1200,
+    "link_index_provenance": 0,
+    "quality_check_result": 24,
+    "scd_airport_charges": 24,
+    "scd_tax_rate": 2
+  },
+  "store_span": [
+    "2025-12-04",
+    "2026-07-31"
+  ],
+  "db_size_mb": 1264.4,
+  "loc": {
+    "src/apix_api/__init__.py": 1,
+    "src/apix_api/main.py": 559,
+    "src/apix_collect/__init__.py": 1,
+    "src/apix_collect/politeness.py": 222,
+    "src/apix_collect/provenance.py": 128,
+    "src/apix_collect/runner.py": 210,
+    "src/apix_collect/sources/__init__.py": 1,
+    "src/apix_collect/sources/synthetic.py": 240,
+    "src/apix_index/__init__.py": 18,
+    "src/apix_index/aggregate.py": 122,
+    "src/apix_index/availability.py": 49,
+    "src/apix_index/elementary.py": 84,
+    "src/apix_index/engine.py": 393,
+    "src/apix_index/smoothing.py": 43,
+    "src/apix_index/types.py": 119,
+    "src/apix_index/uncertainty.py": 65,
+    "src/apix_pipeline/__init__.py": 1,
+    "src/apix_pipeline/backtest.py": 244,
+    "src/apix_pipeline/clean.py": 219,
+    "src/apix_pipeline/decompose.py": 133,
+    "src/apix_pipeline/elasticity.py": 230,
+    "src/apix_pipeline/nowcast.py": 268,
+    "src/apix_pipeline/quality.py": 155,
+    "src/apix_pipeline/run_index.py": 228,
+    "src/apix_reference/__init__.py": 1,
+    "src/apix_reference/cpi.py": 201,
+    "src/apix_store/__init__.py": 1,
+    "src/apix_store/db.py": 321,
+    "tests/test_elasticity.py": 220,
+    "tests/test_end_to_end.py": 189,
+    "tests/test_index_math.py": 431,
+    "tests/test_pipeline_and_governance.py": 449,
+    "tests/test_reference_and_models.py": 280,
+    "cli.py": 406
+  }
+}

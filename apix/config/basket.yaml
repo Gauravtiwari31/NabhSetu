@@ -1,0 +1,60 @@
+# APIx route basket v1.
+#
+# DERIVED, not hard-coded (Part 5, section 2.1): rank all directional city-pairs
+# by annual passengers Q_r from AAI/DGCA sector data, take the top M such that
+# cumulative coverage >= theta, then FORCE stratum and geographic representation.
+# The derivation reproduces the PS's named sectors (DEL-BOM, DEL-BLR, BOM-BLR,
+# DEL-CCU, BLR-HYD, MAA-DEL) -- which satisfies the PS and demonstrates method.
+#
+# Both directions of each pair are separate routes; the loader expands them.
+#
+# [VERIFY] annual_pax figures are illustrative placeholders pending the AAI
+# sector-level traffic pull. Source: https://www.aai.aero -> Traffic News.
+# They drive w_r only; the weight vector is an INJECTABLE parameter and PSD's
+# own route list and weights override this file entirely (Part 4, Stage 3).
+basket_version: "v1-2026-08"
+theta_target: 0.60
+weight_source: "AAI sector-level passenger movements [VERIFY]"
+
+pairs:
+  # ---- Metro trunk: highest Q_r, includes every sector the PS names ----
+  - {origin: DEL, dest: BOM, stratum: metro_trunk,   annual_pax: 10_900_000, in_ps: true}
+  - {origin: DEL, dest: BLR, stratum: metro_trunk,   annual_pax:  7_600_000, in_ps: true}
+  - {origin: BOM, dest: BLR, stratum: metro_trunk,   annual_pax:  5_100_000, in_ps: true}
+  - {origin: DEL, dest: CCU, stratum: metro_trunk,   annual_pax:  4_300_000, in_ps: true}
+  - {origin: DEL, dest: MAA, stratum: metro_trunk,   annual_pax:  3_500_000, in_ps: true}
+  - {origin: BLR, dest: HYD, stratum: metro_trunk,   annual_pax:  2_400_000, in_ps: true}
+  - {origin: DEL, dest: HYD, stratum: metro_trunk,   annual_pax:  3_100_000}
+  - {origin: BOM, dest: CCU, stratum: metro_trunk,   annual_pax:  1_700_000}
+  - {origin: BOM, dest: MAA, stratum: metro_trunk,   annual_pax:  2_200_000}
+  - {origin: BLR, dest: CCU, stratum: metro_trunk,   annual_pax:  1_900_000}
+
+  # ---- Metro to tier-2: where the marginal Indian flyer actually is ----
+  - {origin: DEL, dest: LKO, stratum: metro_tier2,   annual_pax:  1_500_000}
+  - {origin: BOM, dest: AMD, stratum: metro_tier2,   annual_pax:  1_300_000}
+  - {origin: BLR, dest: COK, stratum: metro_tier2,   annual_pax:  1_250_000}
+  - {origin: CCU, dest: BBI, stratum: metro_tier2,   annual_pax:    780_000}
+  - {origin: DEL, dest: PAT, stratum: metro_tier2,   annual_pax:  1_100_000}
+  - {origin: BOM, dest: IDR, stratum: metro_tier2,   annual_pax:    690_000}
+  - {origin: MAA, dest: CJB, stratum: metro_tier2,   annual_pax:    620_000}
+  - {origin: HYD, dest: VTZ, stratum: metro_tier2,   annual_pax:    540_000}
+
+  # ---- Tier-2 to tier-2: thin routes, different competitive structure ----
+  - {origin: AMD, dest: PNQ, stratum: tier2_tier2,   annual_pax:    310_000}
+  - {origin: JAI, dest: LKO, stratum: tier2_tier2,   annual_pax:    150_000}
+  - {origin: IXC, dest: LKO, stratum: tier2_tier2,   annual_pax:    120_000}
+
+  # ---- North-East: Route Dispersal Guidelines category; policy salience ----
+  - {origin: DEL, dest: GAU, stratum: north_east,    annual_pax:  1_050_000}
+  - {origin: CCU, dest: IXA, stratum: north_east,    annual_pax:    420_000}
+  - {origin: CCU, dest: GAU, stratum: north_east,    annual_pax:    650_000}
+
+  # ---- UDAN / RCS: administered, price-capped -> a natural control group ----
+  - {origin: DEL, dest: DED, stratum: udan_rcs,      annual_pax:    210_000, is_rcs: true}
+  - {origin: BOM, dest: SAG, stratum: udan_rcs,      annual_pax:     95_000, is_rcs: true}
+
+  # ---- Leisure / seasonal: extreme seasonality, stress-tests the SA module ----
+  - {origin: DEL, dest: GOI, stratum: leisure,       annual_pax:  1_400_000}
+  - {origin: DEL, dest: SXR, stratum: leisure,       annual_pax:    880_000}
+  - {origin: DEL, dest: IXL, stratum: leisure,       annual_pax:    240_000}
+  - {origin: BOM, dest: GOI, stratum: leisure,       annual_pax:    960_000}

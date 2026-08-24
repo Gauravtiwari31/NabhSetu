@@ -1,0 +1,71 @@
+# The Source Ladder (Part 5, section 1.2 / Part 6, section 2.2).
+# Rungs are tried in order. Rung X does not exist as a code path: there is no
+# CAPTCHA solver, no proxy rotator, and no credential store anywhere in this
+# repository, by design.
+sources:
+  - name: "synthetic_replay"
+    rung: 0
+    type: "simulator"
+    enabled: true
+    legal_basis: "Not a collection source. Deterministic simulator for offline demo and CI."
+    tos_url: null
+    notes: >
+      Generates fare quotes from a documented parametric model so the full
+      pipeline runs end-to-end with no network, no API key and no ToS exposure.
+      Every quote it produces is stamped is_synthetic=1 and every chart drawn
+      from it is watermarked SYNTHETIC. Never present this as measurement.
+
+  - name: "amadeus_self_service"
+    rung: 1
+    type: "licensed_api"
+    enabled: false
+    base_url: "https://test.api.amadeus.com"
+    legal_basis: "Contract; explicit permission under the Amadeus Self-Service terms."
+    tos_url: "https://developers.amadeus.com/terms-of-use"
+    auth_env: "APIX_AMADEUS_KEY"
+    notes: "Primary intended source. Free/sandbox tier is sufficient for the prototype."
+
+  - name: "duffel"
+    rung: 1
+    type: "licensed_api"
+    enabled: false
+    base_url: "https://api.duffel.com"
+    legal_basis: "Contract; explicit permission."
+    tos_url: "https://duffel.com/legal/terms"
+    auth_env: "APIX_DUFFEL_KEY"
+
+  - name: "travelpayouts"
+    rung: 1
+    type: "licensed_api"
+    enabled: false
+    base_url: "https://api.travelpayouts.com"
+    legal_basis: "Contract; explicit permission."
+    tos_url: "https://www.travelpayouts.com/legal/terms/"
+    auth_env: "APIX_TRAVELPAYOUTS_TOKEN"
+
+  - name: "permitted_public_page"
+    rung: 3
+    type: "public_page"
+    enabled: false
+    legal_basis: >
+      Implied licence, subject to a robots.txt check AT COLLECTION TIME and a
+      terms-of-use review recorded per host. Logged-out only, never authenticated.
+    notes: >
+      Disabled until a named host has passed both gates and the review is
+      recorded in dim_source. Enabling this without that review is a governance
+      violation, not a configuration change.
+
+# The Politeness Governor. Every fetch passes through this middleware.
+politeness:
+  user_agent: "APIx-Research/1.0 (+https://example.gov.in/apix/contact)"
+  respect_robots: true
+  default_crawl_delay_s: 10.0     # used when robots.txt declares none
+  jitter_s: 2.0
+  max_concurrency_per_host: 1     # not 8, not 4. One.
+  daily_request_cap_per_host: 2000
+  backoff_base_s: 2.0
+  backoff_max_s: 300.0
+  circuit_breaker_threshold: 3    # consecutive hard blocks -> open
+  circuit_breaker_cooldown_s: 86400
+  hard_block_statuses: [401, 402, 403, 407, 429]
+  kill_switch_hosts: []           # a single flag disables any host instantly

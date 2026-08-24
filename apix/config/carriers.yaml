@@ -1,0 +1,43 @@
+# Carrier dimension. national_share and plf are used to build the within-route
+# carrier weight phi_{c|r} = S_c * F_cr * Seats_cr * PLF_c / sum(...).
+# Part 4, Stage 2.
+#
+# [VERIFY] national_share and plf must be re-pulled from the DGCA monthly
+# traffic report before any of these numbers is quoted on stage.
+# Source: https://www.dgca.gov.in -> Statistics -> Monthly Traffic
+as_of_month: "2026-07"
+source: "DGCA monthly traffic report [VERIFY]"
+carriers:
+  - iata: "6E"
+    icao: "IGO"
+    name: "IndiGo"
+    model: "LCC"
+    national_share: 0.674
+    plf: 0.851
+    avg_seats: 186
+  - iata: "AI"
+    icao: "AIC"
+    name: "Air India"
+    model: "FSC"
+    national_share: 0.265
+    plf: 0.855
+    avg_seats: 174
+  - iata: "QP"
+    icao: "AKJ"
+    name: "Akasa Air"
+    model: "LCC"
+    national_share: 0.045
+    plf: 0.922
+    avg_seats: 189
+  - iata: "SG"
+    icao: "SEJ"
+    name: "SpiceJet"
+    model: "LCC"
+    national_share: 0.016
+    plf: 0.878
+    avg_seats: 189
+
+# S_c, the national-share prior in phi_{c|r}, exists to smooth THIN routes and
+# is OFF by default. With it on, national_share enters twice and IndiGo takes
+# ~87% of the within-route weight against its actual ~67% of passengers.
+apply_national_share_prior: false

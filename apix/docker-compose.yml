@@ -1,0 +1,24 @@
+services:
+  apix:
+    build: .
+    ports: ["8000:8000"]
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config:ro
+    environment:
+      APIX_DB: /app/data/apix.db
+
+  # One-shot: cold machine -> published index. Run before `up`.
+  #   docker compose run --rm seed
+  seed:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config:ro
+    environment:
+      APIX_DB: /app/data/apix.db
+    command: >
+      sh -c "python cli.py init &&
+             python cli.py backfill --days 120 &&
+             python cli.py index &&
+             python cli.py status"

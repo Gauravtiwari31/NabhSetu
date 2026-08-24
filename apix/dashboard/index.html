@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APIx — Real-time Airfare Price Index for India</title>
+<style>
+  /* Colour-blind-safe (viridis-derived). No red/green pairs carry meaning.
+     Contrast checked for WCAG 2.1 AA against the surfaces they sit on. */
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --ink:#14181f; --muted:#4d5661;
+    --line:#d3d8de; --blue:#123a6b; --teal:#0e6e6e; --amber:#8a5a00; --red:#8f2226;
+    --v0:#440154; --v1:#3b528b; --v2:#21918c; --v3:#5ec962; --v4:#fde725;
+    --focus:#0b5cd5;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+       background:var(--bg);color:var(--ink)}
+  header{background:var(--blue);color:#fff;padding:16px 22px}
+  header h1{margin:0;font-size:20px;letter-spacing:.2px}
+  header p{margin:4px 0 0;font-size:13px;color:#c9d6e8}
+  .synthetic{background:#8a5a00;color:#fff;padding:8px 22px;font-size:13px;font-weight:600}
+  main{padding:18px 22px 60px;max-width:1500px;margin:0 auto}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+        padding:16px;margin-bottom:18px}
+  .card h2{margin:0 0 2px;font-size:16px;color:var(--blue)}
+  .card .sub{margin:0 0 12px;font-size:13px;color:var(--muted);max-width:95ch}
+  .row{display:flex;gap:18px;flex-wrap:wrap}
+  .row > .card{flex:1 1 460px}
+  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px;font-weight:600}
+  select,button{font:inherit;padding:6px 9px;border:1px solid var(--line);
+                border-radius:6px;background:#fff;color:var(--ink)}
+  button{cursor:pointer}
+  button:hover{background:#eef3f8}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .dl{font-size:12px;padding:4px 8px}
+  .kpis{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  .kpi{background:#eef3f8;border-left:3px solid var(--blue);padding:8px 12px;border-radius:4px;min-width:130px}
+  .kpi .v{font-size:20px;font-weight:700;color:var(--blue)}
+  .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:6px 0 2px}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+  .note{font-size:12px;color:var(--muted);border-left:3px solid var(--teal);
+        padding:8px 10px;background:#e9f4f3;border-radius:4px;margin-top:10px}
+  .warn{border-left-color:var(--amber);background:#fbf3e2}
+  .scroll{overflow-x:auto}
+  .err{color:var(--red);font-size:13px}
+  svg{display:block;max-width:100%}
+  .tick{font-size:10px;fill:var(--muted)}
+  .grid{stroke:var(--line);stroke-width:1}
+  code{background:#eef1f4;padding:1px 4px;border-radius:3px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>APIx — The Real-time Airfare Price Index for India</h1>
+  <p>SIH 2026 · PS 26056 · MoSPI Data Informatics &amp; Innovation Division — daily, route-level,
+     lead-time-resolved, CPI-2024-native</p>
+</header>
+<div class="synthetic" id="synthetic-banner" hidden></div>
+
+<main>
+  <section class="card">
+    <h2>Headline index</h2>
+    <p class="sub">Jevons at the elementary level, Young/Modified&nbsp;Laspeyres above — the same
+      machinery MoSPI adopted for CPI 2024, so this plugs into COICOP 07.3.3 without a
+      methodological argument. Shaded band is a seeded flight-block bootstrap interval.</p>
+    <div class="controls">
+      <div><label for="variant">Variant</label>
+        <select id="variant">
+          <option value="T" selected>APIx-T — traveller-paid (headline)</option>
+          <option value="B">APIx-B — base fare + YQ/YR (airline pricing)</option>
+          <option value="A">APIx-A — all-in checkout cost</option>
+        </select></div>
+      <div><label for="basis">Time basis</label>
+        <select id="basis">
+          <option value="book" selected>Booking (acquisition)</option>
+          <option value="travel">Travel (CPI-consistent use basis)</option>
+        </select></div>
+      <div><label for="freq">Frequency</label>
+        <select id="freq">
+          <option value="daily" selected>Daily</option>
+          <option value="weekly">Weekly (7-day GM)</option>
+          <option value="monthly">Monthly (calendar GM)</option>
+        </select></div>
+      <div><label for="omega">Lead-time weights ω<sub>τ</sub></label>
+        <select id="omega">
+          <option value="uniform" selected>Uniform</option>
+          <option value="leisure_tilted">Leisure-tilted</option>
+          <option value="business_tilted">Business-tilted</option>
+        </select></div>
+      <button class="dl" id="dl-headline">Download data (CSV)</button>
+    </div>
+    <div class="kpis" id="headline-kpis"></div>
+    <div id="headline-chart"></div>
+    <div class="note" id="headline-note"></div>
+  </section>
+
+  <div class="row">
+    <section class="card">
+      <h2>Availability adjustment</h2>
+      <p class="sub">The single most defensible criticism of a naive fare index: when cheap
+        buckets sell out during a surge, the only quote still observable never
+        <em>changed price</em>, so a strictly matched index reports zero inflation through
+        exactly the episode consumers feel as a fare explosion.
+        <strong>I<sub>adj</sub> = I<sub>matched</sub><sup>A</sup> · I<sub>LAF</sub><sup>1−A</sup></strong>
+        — at A=1 it reduces exactly to the matched index.</p>
+      <div class="controls">
+        <div><label for="avail-route">Route</label><select id="avail-route"></select></div>
+        <button class="dl" id="dl-avail">Download data (CSV)</button>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--v1)"></i>Matched (naive)</span>
+        <span><i class="sw" style="background:var(--v4);border:1px solid #b9a800"></i>Lowest available fare</span>
+        <span><i class="sw" style="background:var(--v2)"></i>Availability-adjusted</span>
+      </div>
+      <div id="avail-chart"></div>
+      <div id="avail-a-chart"></div>
+    </section>
+
+    <section class="card">
+      <h2>Lead-time elasticity η(τ)</h2>
+      <p class="sub">η(τ) = ∂ln p/∂ln τ = β₁ + 2β₂·ln τ, from a pooled log-linear fit with route,
+        carrier, day-of-week and month fixed effects and standard errors clustered by flight.
+        Because β₂ enters, the elasticity varies with lead time — and the trough
+        τ* = exp(−β₁/2β₂) is the most press-friendly number the system produces.</p>
+      <div class="controls">
+        <div><label for="elas-route">Route</label><select id="elas-route"></select></div>
+        <button class="dl" id="dl-elas">Download data (CSV)</button>
+      </div>
+      <div class="kpis" id="elas-kpis"></div>
+      <div id="elas-chart"></div>
+      <div class="note" id="elas-note"></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Sector heat map</h2>
+    <p class="sub">Route × time, coloured by index level on a viridis (colour-blind-safe) scale.
+      Deliberately not red–green.</p>
+    <div class="controls"><button class="dl" id="dl-heat">Download data (CSV)</button></div>
+    <div class="scroll" id="heat-chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>Fare component decomposition</h2>
+    <p class="sub">UDF, ASF, RCS levy and GST are <strong>administered prices</strong> loaded from
+      AERA / BCAS / GST Council notifications into effective-dated SCD tables — never scraped.
+      The base fare is the residual, reconciled to within ₹1. The OTA convenience fee is
+      <em>not a fare</em>: it differs across OTAs for an identical seat, so it is published as a
+      separate distribution cost.</p>
+    <div class="controls"><button class="dl" id="dl-comp">Download data (CSV)</button></div>
+    <div class="legend" id="comp-legend"></div>
+    <div id="comp-chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>Back-test against official CPI</h2>
+    <p class="sub">Formal agreement statistics, not an eyeballed overlay — Pearson and
+      Spearman on levels <em>and</em> on month-on-month changes, Bland–Altman bias and
+      limits of agreement, directional agreement, and RMSE against a random-walk
+      benchmark. Reported whether or not they flatter the index, and refused outright
+      when the overlap is too short to support them.</p>
+    <div class="controls">
+      <div><label for="bt-basis">APIx basis</label>
+        <select id="bt-basis">
+          <option value="travel" selected>Travel (CPI-consistent)</option>
+          <option value="book">Booking</option>
+        </select></div>
+      <div><label for="bt-base">CPI series</label>
+        <select id="bt-base">
+          <option value="2024" selected>CPI 2024 — Transport</option>
+          <option value="2012">CPI 2012 — Transport &amp; Communication</option>
+        </select></div>
+      <button class="dl" id="dl-bt">Download data (CSV)</button>
+    </div>
+    <div class="kpis" id="bt-kpis"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--v1)"></i>APIx (rebased)</span>
+      <span><i class="sw" style="background:var(--v0)"></i>CPI comparator (rebased)</span>
+    </div>
+    <div id="bt-chart"></div>
+    <div class="scroll"><table id="bt-table"></table></div>
+    <div class="note warn" id="bt-caveats"></div>
+  </section>
+
+  <section class="card">
+    <h2>Coverage &amp; governance ledger</h2>
+    <p class="sub">Coverage is reported against the <strong>full configured basket</strong>, not
+      renormalised to 100% over whatever happened to be collected. A defensible 60% honestly
+      reported is worth more to a ministry than an inadmissible 95%.</p>
+    <div class="kpis" id="cov-kpis"></div>
+    <div class="row" style="gap:18px">
+      <div style="flex:1 1 380px">
+        <h3 style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Source ladder</h3>
+        <div class="scroll"><table id="ladder-table"></table></div>
+      </div>
+      <div style="flex:1 1 380px">
+        <h3 style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Coverage by stratum</h3>
+        <div class="scroll"><table id="stratum-table"></table></div>
+      </div>
+    </div>
+    <div class="note warn" id="policy-note"></div>
+  </section>
+</main>
+
+<script>
+const API = "";
+const V = ["#440154","#3b528b","#21918c","#5ec962","#fde725"];
+
+async function get(path){
+  const r = await fetch(API + path);
+  if(!r.ok) throw new Error(path + " -> " + r.status);
+  return r.json();
+}
+function el(id){ return document.getElementById(id); }
+function fmt(x,d=2){ return (x==null||isNaN(x)) ? "—" : Number(x).toFixed(d); }
+
+function download(name, rows){
+  if(!rows.length) return;
+  const cols = Object.keys(rows[0]);
+  const csv = [cols.join(",")].concat(
+    rows.map(r => cols.map(c => {
+      const v = r[c]; return v==null ? "" :
+        (typeof v === "string" && /[",\n]/.test(v)) ? '"'+v.replace(/"/g,'""')+'"' : v;
+    }).join(","))).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- a small SVG line/area chart ---------- */
+function lineChart(mount, opts){
+  const W = opts.width || 1040, H = opts.height || 300;
+  const M = {t:12, r:16, b:26, l:52};
+  const iw = W - M.l - M.r, ih = H - M.t - M.b;
+  const xs = opts.x, series = opts.series.filter(s => s.values.some(v => v!=null));
+  if(!xs.length || !series.length){ mount.innerHTML = '<p class="err">No data.</p>'; return; }
+
+  let lo = opts.yMin, hi = opts.yMax;
+  if(lo==null || hi==null){
+    const all = [];
+    series.forEach(s => s.values.forEach(v => v!=null && !isNaN(v) && all.push(v)));
+    (opts.bands||[]).forEach(b => b.lo.concat(b.hi).forEach(v => v!=null && !isNaN(v) && all.push(v)));
+    lo = Math.min.apply(null, all); hi = Math.max.apply(null, all);
+    const pad = (hi-lo)*0.12 || 1; lo -= pad; hi += pad;
+  }
+  const X = i => M.l + (xs.length<2 ? iw/2 : i*iw/(xs.length-1));
+  const Y = v => M.t + ih - (v-lo)/(hi-lo)*ih;
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${opts.aria||'chart'}">`;
+  for(let g=0; g<=4; g++){
+    const v = lo + g*(hi-lo)/4, y = Y(v);
+    s += `<line class="grid" x1="${M.l}" x2="${W-M.r}" y1="${y}" y2="${y}"/>`;
+    s += `<text class="tick" x="${M.l-6}" y="${y+3}" text-anchor="end">${fmt(v, opts.yDec==null?1:opts.yDec)}</text>`;
+  }
+  (opts.bands||[]).forEach(b => {
+    const pts = [];
+    for(let i=0;i<xs.length;i++) if(b.lo[i]!=null && !isNaN(b.lo[i])) pts.push(`${X(i)},${Y(b.lo[i])}`);
+    for(let i=xs.length-1;i>=0;i--) if(b.hi[i]!=null && !isNaN(b.hi[i])) pts.push(`${X(i)},${Y(b.hi[i])}`);
+    if(pts.length>2) s += `<polygon points="${pts.join(" ")}" fill="${b.color}" opacity="0.18"/>`;
+  });
+  series.forEach(ser => {
+    let d = "", pen = false;
+    ser.values.forEach((v,i) => {
+      if(v==null || isNaN(v)){ pen = false; return; }
+      d += (pen ? " L " : " M ") + X(i) + " " + Y(v); pen = true;
+    });
+    s += `<path d="${d}" fill="none" stroke="${ser.color}" stroke-width="${ser.width||2}"
+           stroke-linejoin="round" ${ser.dash?`stroke-dasharray="${ser.dash}"`:''}/>`;
+  });
+  const step = Math.max(1, Math.ceil(xs.length/8));
+  for(let i=0;i<xs.length;i+=step)
+    s += `<text class="tick" x="${X(i)}" y="${H-8}" text-anchor="middle">${xs[i]}</text>`;
+  s += "</svg>";
+  mount.innerHTML = s;
+}
+
+function areaChart(mount, xs, vals, color, label, yMin, yMax){
+  const W=1040,H=120,M={t:10,r:16,b:22,l:52}, iw=W-M.l-M.r, ih=H-M.t-M.b;
+  const lo = yMin!=null?yMin:0, hi = yMax!=null?yMax:1;
+  const X=i=>M.l+(xs.length<2?iw/2:i*iw/(xs.length-1)), Y=v=>M.t+ih-(v-lo)/(hi-lo)*ih;
+  let pts = `${X(0)},${Y(lo)}`;
+  vals.forEach((v,i)=>{ if(v!=null&&!isNaN(v)) pts += ` ${X(i)},${Y(v)}`; });
+  pts += ` ${X(xs.length-1)},${Y(lo)}`;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label}">`;
+  s+=`<polygon points="${pts}" fill="${color}" opacity="0.30"/>`;
+  s+=`<text class="tick" x="${M.l}" y="${M.t-1}">${label}</text>`;
+  [lo,hi].forEach(v=>{ s+=`<text class="tick" x="${M.l-6}" y="${Y(v)+3}" text-anchor="end">${fmt(v,2)}</text>`;});
+  s+="</svg>"; mount.innerHTML=s;
+}
+
+/* ---------- headline ---------- */
+let headlineRows = [];
+async function loadHeadline(){
+  const v=el("variant").value, b=el("basis").value, f=el("freq").value, o=el("omega").value;
+  const note=el("headline-note");
+  try{
+    const d = await get(`/v1/index?variant=${v}&basis=${b}&frequency=${f}&omega_preset=${o}`);
+    headlineRows = d.observations;
+    const xs = headlineRows.map(r=>r.period);
+    const vals = headlineRows.map(r=>r.value);
+    lineChart(el("headline-chart"), {
+      x: xs, aria:"APIx headline index",
+      bands: headlineRows.some(r=>r.ci_low!=null)
+        ? [{lo:headlineRows.map(r=>r.ci_low), hi:headlineRows.map(r=>r.ci_high), color:V[1]}] : [],
+      series: [{values:vals, color:V[1], width:2.2}]
+    });
+    const first=vals[0], last=vals[vals.length-1];
+    const cov = headlineRows[headlineRows.length-1].coverage_pct;
+    el("headline-kpis").innerHTML = [
+      ["Latest", fmt(last,2)], ["Change from base", (last-first>=0?"+":"")+fmt(last-first,2)+" pts"],
+      ["Periods", xs.length], ["Basket coverage", fmt(cov,1)+"%"],
+      ["Cells", headlineRows[headlineRows.length-1].n_cells ?? "—"]
+    ].map(([l,x])=>`<div class="kpi"><div class="v">${x}</div><div class="l">${l}</div></div>`).join("");
+    note.textContent = `Base period = 100. Uncertainty: ${d.uncertainty}. `+
+      `method ${d.method_version} · weights ${d.weights_version}`;
+    note.className = "note";
+  }catch(e){ note.className="note warn"; note.textContent = "Could not load series: "+e.message; }
+}
+
+/* ---------- availability ---------- */
+async function loadAvailability(){
+  const route = el("avail-route").value;
+  try{
+    const d = await get(`/v1/availability/series?${route?`route=${route}&`:""}basis=book`);
+    const rows = d.observations; window.__avail = rows;
+    const xs = rows.map(r=>r.period);
+    lineChart(el("avail-chart"), {
+      x: xs, height:230, aria:"matched, lowest-available-fare and adjusted index",
+      series:[
+        {values:rows.map(r=>r.matched),  color:V[1], width:2.2},
+        {values:rows.map(r=>r.laf),      color:"#c9b400", width:2, dash:"5 3"},
+        {values:rows.map(r=>r.adjusted), color:V[2], width:2.6}
+      ]
+    });
+    areaChart(el("avail-a-chart"), xs, rows.map(r=>r.availability), V[2],
+              "Availability ratio A — fare families still offered (1.0 = full ladder on sale)",
+              Math.min(0.8, Math.min.apply(null, rows.map(r=>r.availability))), 1);
+  }catch(e){
+    el("avail-chart").innerHTML = `<p class="err">${e.message}</p>`;
+    el("avail-a-chart").innerHTML = "";
+  }
+}
+
+/* ---------- elasticity ---------- */
+async function loadElasticity(){
+  const route = el("elas-route").value;
+  const note = el("elas-note");
+  try{
+    const d = await get(`/v1/elasticity${route?`?route=${route}`:""}`);
+    window.__elas = d.eta;
+    const xs = d.eta.map(e=>"T+"+e.apw_days);
+    lineChart(el("elas-chart"), {
+      x: xs, height:220, yDec:3, aria:"lead-time elasticity",
+      series:[{values:d.eta.map(e=>e.eta), color:V[0], width:2.4}]
+    });
+    el("elas-kpis").innerHTML = [
+      ["τ* (cheapest)", d.tau_star_days ? fmt(d.tau_star_days,1)+" days" : "not identified"],
+      ["β₁", fmt(d.beta1,4)], ["β₂", fmt(d.beta2,4)],
+      ["R²", fmt(d.r_squared,3)], ["Clusters", d.n_clusters]
+    ].map(([l,x])=>`<div class="kpi"><div class="v">${x}</div><div class="l">${l}</div></div>`).join("");
+    note.className = d.note ? "note warn" : "note";
+    note.textContent = d.note
+      ? d.note
+      : `Cheapest time to book ${route||"across the basket"}: about `+
+        `${Math.round(d.tau_star_days)} days out (95% CI `+
+        `${fmt(d.tau_star_ci95[0],1)}–${fmt(d.tau_star_ci95[1],1)}). `+
+        `SEs clustered by flight over ${d.n_clusters} flights, ${d.n_obs.toLocaleString()} quotes.`;
+  }catch(e){ note.className="note warn"; note.textContent="Elasticity unavailable: "+e.message; }
+}
+
+/* ---------- heat map ---------- */
+async function loadHeat(routes){
+  const cell = [];
+  for(const r of routes.slice(0,12)){
+    try{
+      const d = await get(`/v1/index/routes/${r}?apw_days=7`);
+      cell.push({route:r, obs:d.observations});
+    }catch(e){}
+  }
+  if(!cell.length){ el("heat-chart").innerHTML='<p class="err">No route series.</p>'; return; }
+  window.__heat = cell.flatMap(c=>c.obs.map(o=>({route:c.route,period:o.period,value:o.value})));
+  const periods = cell[0].obs.map(o=>o.period);
+  const step = Math.max(1, Math.floor(periods.length/60));
+  const cols = periods.filter((_,i)=>i%step===0);
+  const all = window.__heat.map(d=>d.value);
+  const lo = Math.min.apply(null,all), hi = Math.max.apply(null,all);
+  const cw = Math.max(6, Math.min(16, 1000/cols.length)), rh = 22, L = 90;
+  let s = `<svg viewBox="0 0 ${L+cols.length*cw+20} ${cell.length*rh+34}" role="img"
+            aria-label="route by time heat map">`;
+  cell.forEach((c,ri)=>{
+    const map = Object.fromEntries(c.obs.map(o=>[o.period,o.value]));
+    s += `<text class="tick" x="${L-6}" y="${ri*rh+rh/2+4+22}" text-anchor="end">${c.route}</text>`;
+    cols.forEach((p,ci)=>{
+      const v = map[p]; if(v==null) return;
+      const t = (v-lo)/(hi-lo||1);
+      const idx = Math.min(3, Math.floor(t*4));
+      const mix = (t*4)-idx;
+      s += `<rect x="${L+ci*cw}" y="${ri*rh+22}" width="${cw-1}" height="${rh-2}"
+             fill="${V[Math.min(4,idx+(mix>0.5?1:0))]}"><title>${c.route} ${p}: ${fmt(v,2)}</title></rect>`;
+    });
+  });
+  s += `<text class="tick" x="${L}" y="14">${cols[0]}</text>`;
+  s += `<text class="tick" x="${L+cols.length*cw}" y="14" text-anchor="end">${cols[cols.length-1]}</text>`;
+  s += "</svg>";
+  s += `<div class="legend" style="margin-top:8px">${
+    V.map((c,i)=>`<span><i class="sw" style="background:${c}"></i>${
+      fmt(lo+(hi-lo)*i/4,1)}</span>`).join("")}</div>`;
+  el("heat-chart").innerHTML = s;
+}
+
+/* ---------- components ---------- */
+async function loadComponents(){
+  const d = await get("/v1/components");
+  const rows = d.observations; window.__comp = rows;
+  const keys = ["base_fare","udf","asf","rcs_levy","gst","convenience_fee"];
+  const labels = {base_fare:"Base fare (+YQ/YR)",udf:"UDF (AERA)",asf:"ASF (BCAS)",
+                  rcs_levy:"RCS levy",gst:"GST",convenience_fee:"OTA convenience fee"};
+  const colors = [V[1],V[2],V[3],"#9a6400",V[0],"#6b7280"];
+  el("comp-legend").innerHTML = keys.map((k,i)=>
+    `<span><i class="sw" style="background:${colors[i]}"></i>${labels[k]}</span>`).join("");
+  const xs = rows.map(r=>r.period);
+  const W=1040,H=280,M={t:12,r:16,b:26,l:60},iw=W-M.l-M.r,ih=H-M.t-M.b;
+  const tot = rows.map(r=>keys.reduce((a,k)=>a+(r[k]||0),0));
+  const hi = Math.max.apply(null,tot)*1.05;
+  const X=i=>M.l+(xs.length<2?iw/2:i*iw/(xs.length-1)), Y=v=>M.t+ih-v/hi*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="fare component stack">`;
+  for(let g=0;g<=4;g++){ const v=g*hi/4,y=Y(v);
+    s+=`<line class="grid" x1="${M.l}" x2="${W-M.r}" y1="${y}" y2="${y}"/>`;
+    s+=`<text class="tick" x="${M.l-6}" y="${y+3}" text-anchor="end">₹${Math.round(v)}</text>`;}
+  let base = rows.map(()=>0);
+  keys.forEach((k,ki)=>{
+    const top = rows.map((r,i)=>base[i]+(r[k]||0));
+    let pts=[];
+    for(let i=0;i<xs.length;i++) pts.push(`${X(i)},${Y(base[i])}`);
+    for(let i=xs.length-1;i>=0;i--) pts.push(`${X(i)},${Y(top[i])}`);
+    s+=`<polygon points="${pts.join(" ")}" fill="${colors[ki]}" opacity="0.88"/>`;
+    base = top;
+  });
+  const step=Math.max(1,Math.ceil(xs.length/8));
+  for(let i=0;i<xs.length;i+=step)
+    s+=`<text class="tick" x="${X(i)}" y="${H-8}" text-anchor="middle">${xs[i]}</text>`;
+  s+="</svg>"; el("comp-chart").innerHTML=s;
+}
+
+/* ---------- back-test ---------- */
+async function loadBacktest(){
+  const basis = el("bt-basis").value, base = el("bt-base").value;
+  const cav = el("bt-caveats");
+  try{
+    const d = await get(`/v1/backtest?basis=${basis}&base_year=${base}`);
+    window.__bt = d.aligned || [];
+    cav.innerHTML = (d.caveats||[]).map(c=>"<div>• "+c+"</div>").join("") || "—";
+
+    if(!d.reportable){
+      el("bt-kpis").innerHTML =
+        `<div class="kpi"><div class="v">${d.n_overlapping_months}</div>
+         <div class="l">Overlapping months</div></div>
+         <div class="kpi"><div class="v">not reportable</div>
+         <div class="l">Status</div></div>`;
+      el("bt-chart").innerHTML = "";
+      el("bt-table").innerHTML = "";
+      return;
+    }
+    const s = d.statistics;
+    el("bt-kpis").innerHTML = [
+      ["Overlapping months", d.n_overlapping_months],
+      ["Pearson r (levels)", fmt(s.pearson_r_level,3)],
+      ["Pearson r (m-o-m)", fmt(s.pearson_r_mom_change,3)],
+      ["Directional agreement", fmt(s.directional_agreement_pct,1)+"%"],
+      ["Skill vs random walk", fmt(s.skill_vs_rw_pct,1)+"%"]
+    ].map(([l,x])=>`<div class="kpi"><div class="v">${x}</div><div class="l">${l}</div></div>`).join("");
+
+    const rows = d.aligned;
+    const xs = rows.map(r=>r.period);
+    const a0 = rows[0].value, c0 = rows[0].idx;
+    lineChart(el("bt-chart"), {
+      x: xs, height:250, aria:"APIx versus CPI comparator, both rebased",
+      series:[
+        {values: rows.map(r=>100*r.value/a0), color:V[1], width:2.4},
+        {values: rows.map(r=>100*r.idx/c0),   color:V[0], width:2.4, dash:"6 3"}
+      ]
+    });
+
+    const order = ["pearson_r_level","spearman_rho_level","pearson_r_mom_change",
+      "spearman_rho_mom_change","bland_altman_bias","bland_altman_sd_diff",
+      "bland_altman_loa_low","bland_altman_loa_high","bland_altman_mean_abs_diff",
+      "directional_agreement_pct","rmse_model","rmse_random_walk","skill_vs_rw_pct"];
+    el("bt-table").innerHTML = "<tr><th>Statistic</th><th class='num'>Value</th></tr>"+
+      order.filter(k=>k in s).map(k=>
+        `<tr><td>${k.replace(/_/g," ")}</td><td class="num">${fmt(s[k],4)}</td></tr>`).join("");
+  }catch(e){
+    cav.textContent = "Back-test unavailable: "+e.message;
+    el("bt-kpis").innerHTML=""; el("bt-chart").innerHTML=""; el("bt-table").innerHTML="";
+  }
+}
+
+/* ---------- coverage ---------- */
+async function loadCoverage(){
+  const d = await get("/v1/coverage");
+  el("cov-kpis").innerHTML = [
+    ["Routes collected", `${d.routes_collected} / ${d.routes_in_basket}`],
+    ["Coverage by traffic weight", fmt(d.coverage_by_traffic_weight_pct,1)+"%"],
+    ["Coverage by route count", fmt(d.coverage_by_route_count_pct,1)+"%"],
+    ["PS-named sectors", `${d.ps_named_sectors_covered} / ${d.ps_named_sectors_total}`],
+    ["Basket version", d.basket_version]
+  ].map(([l,x])=>`<div class="kpi"><div class="v">${x}</div><div class="l">${l}</div></div>`).join("");
+
+  el("ladder-table").innerHTML =
+    "<tr><th>Rung</th><th>Source</th><th>Type</th><th>Enabled</th><th class='num'>Quotes</th><th>Legal basis</th></tr>"+
+    d.source_ladder.map(s=>`<tr><td>${s.ladder_rung}</td><td>${s.name}</td><td>${s.type}</td>
+      <td>${s.enabled?"yes":"no"}</td><td class="num">${Number(s.n_quotes||0).toLocaleString()}</td>
+      <td style="font-size:11px;color:var(--muted)">${(s.legal_basis||"").slice(0,90)}</td></tr>`).join("");
+
+  el("stratum-table").innerHTML =
+    "<tr><th>Stratum</th><th class='num'>Routes</th><th class='num'>Collected</th><th class='num'>Weight</th></tr>"+
+    d.by_stratum.map(s=>`<tr><td>${s.stratum}</td><td class="num">${s.routes}</td>
+      <td class="num">${s.collected}</td><td class="num">${fmt(s.weight*100,1)}%</td></tr>`).join("");
+
+  const m = await get("/v1/methodology");
+  el("policy-note").innerHTML =
+    "<strong>Zero-Circumvention Policy.</strong> "+m.collection_policy.rationale+
+    "<br><br><strong>APIx will not:</strong> "+m.collection_policy.will_not.join("; ")+
+    ".<br><strong>APIx will:</strong> "+m.collection_policy.will.join("; ")+
+    ".<br><br><strong>Personal data:</strong> "+m.personal_data;
+  return d;
+}
+
+/* ---------- boot ---------- */
+(async function(){
+  try{
+    const health = await get("/health");
+    const meta = await get("/v1/methodology");
+    if(meta.is_synthetic){
+      const b = el("synthetic-banner"); b.hidden = false;
+      b.textContent = "⚠ SYNTHETIC DATA — these charts are computed from the deterministic "+
+        "simulator, not from collected fares. They demonstrate the method. They are NOT a "+
+        "measurement of Indian airfares.";
+    }
+    // The collected routes are the basket minus the ones the coverage ledger
+    // reports as uncollected. Deriving it this way rather than hard-coding a
+    // list means the dashboard follows the basket when the basket changes.
+    const cov = await loadCoverage();
+    const uncollected = new Set(cov.uncollected_routes);
+    const routeList = cov.all_routes.filter(r => !uncollected.has(r));
+
+    ["avail-route","elas-route"].forEach(id=>{
+      const s = el(id);
+      if(id==="elas-route") s.innerHTML = '<option value="">All routes (pooled)</option>';
+      routeList.forEach(r=>{ const o=document.createElement("option"); o.value=r; o.textContent=r; s.appendChild(o); });
+    });
+
+    await loadHeadline();
+    await loadComponents();
+    await loadHeat(routeList);
+    await loadAvailability();
+    await loadElasticity();
+    await loadBacktest();
+
+    ["variant","basis","freq","omega"].forEach(id=>el(id).addEventListener("change", loadHeadline));
+    el("avail-route").addEventListener("change", loadAvailability);
+    el("elas-route").addEventListener("change", loadElasticity);
+    ["bt-basis","bt-base"].forEach(id=>el(id).addEventListener("change", loadBacktest));
+    el("dl-headline").onclick = ()=>download("apix_headline.csv", headlineRows);
+    el("dl-avail").onclick    = ()=>download("apix_availability.csv", window.__avail||[]);
+    el("dl-elas").onclick     = ()=>download("apix_elasticity.csv", window.__elas||[]);
+    el("dl-heat").onclick     = ()=>download("apix_heatmap.csv", window.__heat||[]);
+    el("dl-comp").onclick     = ()=>download("apix_components.csv", window.__comp||[]);
+    el("dl-bt").onclick       = ()=>download("apix_backtest.csv", window.__bt||[]);
+  }catch(e){
+    document.querySelector("main").insertAdjacentHTML("afterbegin",
+      `<div class="card"><p class="err">Could not reach the API: ${e.message}.
+       Run <code>python cli.py serve</code> and make sure the index has been published
+       (<code>python cli.py index</code>).</p></div>`);
+  }
+})();
+</script>
+</body>
+</html>

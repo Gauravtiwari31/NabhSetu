@@ -1,0 +1,42 @@
+# APIx method configuration.
+# Every value here is stamped onto published index numbers as `method_version`.
+method_version: "1.0.0"
+
+# Advance-purchase windows (tau, days before departure). Part 4, product key.
+apw_windows: [1, 7, 15, 30, 45]
+
+# Elementary aggregate: minimum matched products before a cell is published.
+# Below this the cell is suppressed and its weight redistributed pro-rata
+# within the route (Part 4, Stage 1).
+n_min: 5
+
+# Outlier detection (Part 4, Stage 0c). Multiplier is 3, not 1.5: fares are
+# legitimately dispersed and 1.5 would trim real observations.
+tukey_k: 3.0
+hampel_z: 3.5
+jump_sigma: 3.0
+
+# Day-of-week de-seasonalising: 7-day centred geometric moving average.
+dow_window: 7
+
+# Uncertainty: flight-block bootstrap.
+bootstrap_draws: 500
+bootstrap_seed: 20260822
+ci_level: 0.90
+
+# Lead-time weights omega_tau. Three declared presets; the headline is published
+# under all three and the spread is the sensitivity analysis (Part 4, Stage 4).
+# THIS IS A POLICY PARAMETER, NOT A MEASUREMENT. The booking lead-time
+# distribution for India is not public (DGCA asked in Dec 2024; FIA refused).
+omega_presets:
+  uniform:          {1: 0.20, 7: 0.20, 15: 0.20, 30: 0.20, 45: 0.20}
+  leisure_tilted:   {1: 0.05, 7: 0.10, 15: 0.20, 30: 0.30, 45: 0.35}
+  business_tilted:  {1: 0.30, 7: 0.30, 15: 0.20, 30: 0.15, 45: 0.05}
+default_omega_preset: uniform
+
+# Index variants (Part 4, section 2.1).
+#   B = base fare + YQ/YR only        (pure airline pricing)
+#   T = everything except OTA fee     (what a traveller pays -- HEADLINE)
+#   A = T + OTA convenience fee       (all-in checkout cost)
+variants: ["B", "T", "A"]
+headline_variant: "T"

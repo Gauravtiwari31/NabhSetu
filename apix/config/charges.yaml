@@ -1,0 +1,70 @@
+# Administered charges and tax rates -- SCD Type 2 seed data.
+#
+# Part 4, section 2.1: DO NOT SCRAPE ADMINISTERED CHARGES. UDF, ASF, RCS and GST
+# are published by AERA, BCAS/MoCA and the GST Council. They are maintained here
+# as a versioned slowly-changing dimension loaded from official notifications,
+# with effective_from / effective_to dates. The base fare is then computed as a
+# RESIDUAL and cross-checked against the airline's displayed breakup.
+# This turns a scraping problem into a reconciliation problem, and reconciliation
+# is auditable.
+#
+# [VERIFY] Every figure below must be re-pulled from the primary notification
+# before it is quoted. These are structurally correct placeholders.
+
+# ---- GST on domestic air travel, ad valorem on the fare base ----
+# [VERIFY] Source: GST Council rate schedule.
+tax_rates:
+  - cabin: economy
+    gst_rate: 0.05
+    effective_from: "2017-07-01"
+    effective_to: null
+    notification_ref: "[VERIFY] GST Council rate schedule - economy"
+  - cabin: other_than_economy
+    gst_rate: 0.12
+    effective_from: "2017-07-01"
+    effective_to: null
+    notification_ref: "[VERIFY] GST Council rate schedule - other than economy"
+
+# ---- Aviation Security Fee: BCAS/MoCA notification, uniform nationally ----
+asf_domestic_inr: 236
+asf_effective_from: "2024-04-01"
+asf_source: "[VERIFY] BCAS/MoCA ASF notification"
+
+# ---- RCS-UDAN levy, applies on specified routes only ----
+rcs_levy_inr: 50
+rcs_source: "[VERIFY] MoCA RCS-UDAN cross-subsidy notification"
+
+# ---- User Development Fee, per airport, per AERA tariff order ----
+# [VERIFY] Source: https://aera.gov.in -> tariff orders, per airport.
+udf_domestic_inr:
+  DEL: 129
+  BOM: 195
+  BLR: 306
+  MAA: 154
+  CCU: 173
+  HYD: 281
+  GOI: 275
+  AMD: 155
+  PNQ: 145
+  COK: 260
+  LKO: 150
+  GAU: 145
+  BBI: 140
+  PAT: 140
+  IDR: 145
+  CJB: 140
+  VTZ: 140
+  JAI: 150
+  IXC: 145
+  SXR: 140
+  IXL: 140
+  IXA: 140
+  DED: 130
+  SAG: 130
+udf_effective_from: "2025-04-01"
+udf_source: "[VERIFY] AERA tariff orders, per airport"
+
+# ---- Typical OTA convenience fee. NOT A FARE (Part 4, section 2.1): it is a
+# distribution charge that differs across OTAs for an identical seat. Excluded
+# from the fare index; published as a separate "Distribution Cost" series. ----
+convenience_fee_inr: 299

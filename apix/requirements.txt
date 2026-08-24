@@ -1,0 +1,12 @@
+# Pinned to what the MVP was built and tested against. Pin every dependency and
+# commit the lockfile: a demo that fails to build on the judge's laptop is a zero.
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.12.0
+scikit-learn==1.4.2
+PyYAML==6.0.3
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.10.3
+httpx==0.28.1
+pytest==8.2.0

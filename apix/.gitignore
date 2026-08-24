@@ -1,0 +1,16 @@
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.parquet
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+config/psd_weights.yaml
+reports/preview/
+reports/coverage.json
+reports/charcheck.txt
+reports/parsecheck.txt
+.coverage
