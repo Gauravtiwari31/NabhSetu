@@ -3,8 +3,8 @@
 **SIH 2026 · PS 26056 · MoSPI, Data Informatics & Innovation Division**
 
 A daily, route-level, lead-time-resolved airfare price index built on the same
-index-number machinery MoSPI adopted for CPI 2024 — Jevons at the elementary
-level, Young/Modified Laspeyres above it — so it plugs into COICOP sub-class
+index-number machinery MoSPI adopted for CPI 2024 Jevons at the elementary
+level, Young/Modified Laspeyres above it so it plugs into COICOP sub-class
 07.3.3 without a methodological argument.
 
 ---
@@ -77,8 +77,8 @@ service of source websites."* **These cannot both be satisfied.** A CAPTCHA is a
 technical access control, so defeating it is unauthorised access under s.43 of
 the IT Act, 2000.
 
-APIx inverts the priority — compliance is the hard constraint, coverage is the
-optimisation target — and encodes that in code, not in prose:
+APIx inverts the priority compliance is the hard constraint, coverage is the
+optimisation target and encodes that in code, not in prose:
 
 | Enforced where | What it does |
 |---|---|
@@ -187,10 +187,10 @@ naive implementation of the Part 4 arithmetic: **max absolute difference 0.0**.
 **The matching key.** Two quotes are the same product iff they agree on
 `(route, carrier, τ, flight_number, fare_family, cabin, stops)`. Matching on
 `flight_number` rather than departure date tracks *the same flight in the
-schedule* across weeks — the airline analogue of tracking the same SKU in a shop.
+schedule* across weeks the airline analogue of tracking the same SKU in a shop.
 
 **The day-of-week trap.** Hold τ fixed and advance t by one day, and the
-departure date advances too — so a Tuesday-departure observation becomes a
+departure date advances too so a Tuesday-departure observation becomes a
 Wednesday one. Fares are strongly day-of-week dependent, so a naive daily index
 reports pure day-of-week variation as inflation. The 7-day centred geometric MA
 removes it exactly. State this unprompted; it is what a MoSPI statistician probes
@@ -202,7 +202,7 @@ for.
 
 **ω_τ is the single largest judgement call in the index.** The weights over
 advance-purchase windows should be the distribution of actual booking lead times
-of Indian travellers. That distribution is not public — DGCA asked airlines for
+of Indian travellers. That distribution is not public DGCA asked airlines for
 ticket-level data in December 2024 and the Federation of Indian Airlines refused
 on commercial-confidentiality grounds. APIx therefore treats ω_τ as a **declared,
 versioned policy parameter**, ships three named presets, publishes under all
@@ -210,7 +210,7 @@ three, and the spread between them *is* the sensitivity analysis. It does not
 pretend the number is measured. `GET /v1/methodology` says so in the payload.
 
 **Coverage under the compliance constraint is lower than a scrape-everything
-team's.** The demo covers 12 of 60 basket routes — 20% by route count, **59.3% by
+team's.** The demo covers 12 of 60 basket routes 20% by route count, **59.3% by
 traffic weight**, and 12/12 of the sectors the PS names. `/v1/coverage` reports
 against the **full** basket and lists the uncollected routes rather than
 renormalising the gap away.
@@ -223,7 +223,7 @@ prior correctly off, φ reproduces published DGCA passenger shares to within 1.3
 **Airfare is a small CPI weight.** Transport is 8.796% of combined CPI 2024 and
 air fare is a fraction of that. Do not sell APIx as moving headline inflation.
 Sell it as methodological infrastructure MoSPI can reuse for hotels, cabs and the
-twelve online markets it just added — airfare is the *hardest* case, because of
+twelve online markets it just added airfare is the *hardest* case, because of
 dynamic pricing, perishable inventory and availability censoring.
 
 Every figure marked **`[VERIFY]`** in `config/` moves and must be re-pulled from
@@ -250,7 +250,7 @@ aggregate. For the item series proper you need an item-level extract from
 
 This matters for interpretation: Transport also contains road fuel, vehicle
 purchase, rail fares and communication, and air fare is a small slice of it. So
-**agreement is diluted by construction** — a weak correlation against Transport
+**agreement is diluted by construction** a weak correlation against Transport
 is the expected result, not evidence APIx is broken. Every result row carries
 the comparator level so nobody can quote a number without knowing what it
 compared against.
@@ -386,7 +386,7 @@ tests/                          117 tests
 ## Security and governance
 
 - **No personal data is collected, stored or inferred.** Fares are not personal
-  data, so the DPDP Act, 2023 does not attach — a design property, not a
+  data, so the DPDP Act, 2023 does not attach a design property, not a
   disclaimer.
 - Quotes and the provenance ledger are immutable, enforced by database triggers
   rather than by convention. Corrections are new rows with `supersedes_quote_id`.
