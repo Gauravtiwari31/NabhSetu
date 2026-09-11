@@ -28,7 +28,7 @@ sources:
   - name: "duffel"
     rung: 1
     type: "licensed_api"
-    enabled: false
+    enabled: true
     base_url: "https://api.duffel.com"
     legal_basis: "Contract; explicit permission."
     tos_url: "https://duffel.com/legal/terms"

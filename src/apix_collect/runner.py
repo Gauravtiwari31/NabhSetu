@@ -102,6 +102,31 @@ def collect_day(conn, cfg: Dict, on: date, run_id: str,
             per_source[name] = {"rung": rung, "enabled": True, "n_quotes": 0,
                                 "outcome": "NO_CREDENTIAL"}
             continue
+            
+        if name == "duffel":
+            from apix_collect.sources.duffel import DuffelSource
+            source = DuffelSource(os.environ.get(key_env), route_rows)
+            apw_windows = tuple(cfg["method"]["apw_windows"])
+            try:
+                rows = source.collect(on, routes=routes, apw_windows=apw_windows)
+                pid = ledger.record(source=name, ladder_rung=rung,
+                                    legal_basis=spec["legal_basis"], outcome="OK",
+                                    robots_directive="NOT_APPLICABLE", n_quotes=len(rows),
+                                    note=f"Duffel API, date={on.isoformat()}")
+                for r in rows:
+                    r["source"] = name
+                    r["provenance_id"] = pid
+                    r["raw_hash"] = payload_hash(r)
+                collected.extend(rows)
+                per_source[name] = {"rung": rung, "enabled": True, "n_quotes": len(rows),
+                                    "outcome": "OK", "legal_basis": spec["legal_basis"]}
+            except Exception as e:
+                ledger.record(source=name, ladder_rung=rung, legal_basis=spec["legal_basis"],
+                              outcome="ERROR", note=f"Duffel error: {e}")
+                per_source[name] = {"rung": rung, "enabled": True, "n_quotes": 0,
+                                    "outcome": "ERROR"}
+            continue
+
         ledger.record(source=name, ladder_rung=rung, legal_basis=spec["legal_basis"],
                       outcome="ERROR", note="adapter not implemented in MVP")
         per_source[name] = {"rung": rung, "enabled": True, "n_quotes": 0,

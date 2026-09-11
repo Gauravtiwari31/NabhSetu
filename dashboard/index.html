@@ -232,7 +232,11 @@ function download(name, rows){
     }).join(","))).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
-  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 
 /* ---------- a small SVG line/area chart ---------- */
@@ -274,6 +278,14 @@ function lineChart(mount, opts){
     });
     s += `<path d="${d}" fill="none" stroke="${ser.color}" stroke-width="${ser.width||2}"
            stroke-linejoin="round" ${ser.dash?`stroke-dasharray="${ser.dash}"`:''}/>`;
+    
+    // Add hover circles for each point
+    ser.values.forEach((v,i) => {
+      if(v==null || isNaN(v)) return;
+      s += `<circle cx="${X(i)}" cy="${Y(v)}" r="5" fill="transparent" stroke="transparent" style="cursor:crosshair;">
+              <title>${xs[i]}: ${fmt(v, opts.yDec==null?2:opts.yDec)}</title>
+            </circle>`;
+    });
   });
   const step = Math.max(1, Math.ceil(xs.length/8));
   for(let i=0;i<xs.length;i+=step)
