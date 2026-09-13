@@ -1,0 +1,2 @@
+[tool.vercel]
+entrypoint = "src.apix_api.main:app"
