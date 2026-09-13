@@ -23,11 +23,11 @@ if str(ROOT / "src") not in sys.path:
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from fastapi import Depends, FastAPI, HTTPException, Query  # noqa: E402
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse  # noqa: E402
-from fastapi.staticfiles import StaticFiles  # noqa: E402
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 
-from apix_store import db  # noqa: E402
+from apix_store import db
 
 app = FastAPI(
     title="APIx -- Real-time Airfare Price Index for India",
@@ -45,6 +45,13 @@ app = FastAPI(
     ),
 )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    return JSONResponse(
+        status_code=500,
+        content={"status": "error", "error": str(exc), "traceback": traceback.format_exc(), "url": str(request.url)}
+    )
 
 def get_conn():
     try:
@@ -570,3 +577,36 @@ def root():
     return HTMLResponse(
         '<meta http-equiv="refresh" content="0; url=/dashboard/">'
         '<p>APIx. <a href="/dashboard/">Dashboard</a> | <a href="/docs">API docs</a></p>')
+
+@app.get("/debug", tags=["ops"])
+def debug(conn=Depends(get_conn)):
+    import os
+    from apix_store import db
+    data_dir = str(db.DATA_DIR)
+    config_dir = str(db.CONFIG_DIR)
+    
+    data_files = []
+    if os.path.exists(data_dir):
+        data_files = os.listdir(data_dir)
+        
+    config_files = []
+    if os.path.exists(config_dir):
+        config_files = os.listdir(config_dir)
+        
+    conn_type = str(type(conn))
+    conn_str = str(conn) if isinstance(conn, Exception) else "connected"
+    
+    return {
+        "cwd": os.getcwd(),
+        "__file__": __file__,
+        "data_dir": data_dir,
+        "data_files": data_files,
+        "config_dir": config_dir,
+        "config_files": config_files,
+        "db_path": str(db.db_path()),
+        "db_exists": db.db_path().exists(),
+        "is_writable": os.access(db.db_path().parent, os.W_OK),
+        "conn_type": conn_type,
+        "conn_error": conn_str
+    }
+
