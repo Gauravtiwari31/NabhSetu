@@ -47,11 +47,14 @@ app = FastAPI(
 
 
 def get_conn():
-    conn = db.connect()
     try:
-        yield conn
-    finally:
-        conn.close()
+        conn = db.connect()
+        try:
+            yield conn
+        finally:
+            conn.close()
+    except Exception as e:
+        yield e
 
 
 def _records(df: pd.DataFrame) -> List[dict]:
@@ -542,9 +545,15 @@ def get_methodology(conn=Depends(get_conn)):
 
 @app.get("/health", tags=["ops"])
 def health(conn=Depends(get_conn)):
-    return {"status": "ok", "quotes": db.table_count(conn, "fact_fare_quote"),
-            "index_values": db.table_count(conn, "fact_index_value"),
-            "ledger_records": db.table_count(conn, "ledger_provenance")}
+    if isinstance(conn, Exception):
+        return {"status": "error", "error_type": "db_connect", "error": str(conn), "db_path": str(db.db_path()), "exists": db.db_path().exists()}
+    try:
+        return {"status": "ok", "quotes": db.table_count(conn, "fact_fare_quote"),
+                "index_values": db.table_count(conn, "fact_index_value"),
+                "ledger_records": db.table_count(conn, "ledger_provenance")}
+    except Exception as e:
+        import traceback
+        return {"status": "error", "error": str(e), "traceback": traceback.format_exc(), "db_path": str(db.db_path()), "exists": db.db_path().exists()}
 
 
 DASHBOARD = ROOT / "dashboard"
