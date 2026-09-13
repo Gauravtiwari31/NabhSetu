@@ -46,7 +46,11 @@ def connect(path: Optional[Path] = None) -> sqlite3.Connection:
     
     # Handle read-only file systems (like Vercel Serverless Functions)
     if p.exists() and not os.access(p.parent, os.W_OK):
-        conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+        import shutil
+        tmp_p = Path(f"/tmp/{p.name}")
+        if not tmp_p.exists():
+            shutil.copy2(p, tmp_p)
+        conn = sqlite3.connect(str(tmp_p))
     else:
         p.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(str(p))
