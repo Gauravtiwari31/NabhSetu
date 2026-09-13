@@ -490,10 +490,11 @@ def get_provenance(index_id: str, conn=Depends(get_conn)):
 @app.get("/v1/methodology", tags=["governance"])
 def get_methodology(conn=Depends(get_conn)):
     """Machine-readable method and weight versions in force."""
-    cfg = db.load_config()
-    weights = db.build_weights(conn, cfg)
-    return {
-        **_meta(conn),
+    try:
+        cfg = db.load_config()
+        weights = db.build_weights(conn, cfg)
+        return {
+            **_meta(conn),
         "elementary_formula": "Jevons (geometric mean of price relatives)",
         "elementary_rationale": ("MoSPI uses Jevons for CPI 2024; it satisfies time reversal "
                                  "and transitivity; fares are approximately lognormal."),
@@ -541,6 +542,9 @@ def get_methodology(conn=Depends(get_conn)):
         },
         "personal_data": "None collected, stored or inferred. DPDP Act, 2023 does not attach.",
     }
+    except Exception as e:
+        import traceback
+        return {"status": "error", "error": str(e), "traceback": traceback.format_exc()}
 
 
 @app.get("/health", tags=["ops"])

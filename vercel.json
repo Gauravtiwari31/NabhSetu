@@ -1,7 +1,7 @@
 {
   "functions": {
     "src/apix_api/main.py": {
-      "includeFiles": "{data/apix.db,config/*.yaml}"
+      "includeFiles": "**/*"
     }
   }
 }
