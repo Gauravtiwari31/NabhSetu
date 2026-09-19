@@ -43,18 +43,8 @@ def db_path() -> Path:
 
 def connect(path: Optional[Path] = None) -> sqlite3.Connection:
     p = Path(path) if path else db_path()
-    
-    # Handle read-only file systems (like Vercel Serverless Functions)
-    if p.exists() and not os.access(p.parent, os.W_OK):
-        import shutil
-        tmp_p = Path(f"/tmp/{p.name}")
-        if not tmp_p.exists():
-            shutil.copy2(p, tmp_p)
-        conn = sqlite3.connect(str(tmp_p))
-    else:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(str(p))
-        
+    p.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(p))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn

@@ -6,7 +6,7 @@ sources:
   - name: "synthetic_replay"
     rung: 0
     type: "simulator"
-    enabled: true
+    enabled: false
     legal_basis: "Not a collection source. Deterministic simulator for offline demo and CI."
     tos_url: null
     notes: >

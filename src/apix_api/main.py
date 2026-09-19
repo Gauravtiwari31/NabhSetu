@@ -23,11 +23,11 @@ if str(ROOT / "src") not in sys.path:
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
-from fastapi import Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import Depends, FastAPI, HTTPException, Query  # noqa: E402
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse  # noqa: E402
+from fastapi.staticfiles import StaticFiles  # noqa: E402
 
-from apix_store import db
+from apix_store import db  # noqa: E402
 
 app = FastAPI(
     title="APIx -- Real-time Airfare Price Index for India",
@@ -45,23 +45,13 @@ app = FastAPI(
     ),
 )
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    import traceback
-    return JSONResponse(
-        status_code=500,
-        content={"status": "error", "error": str(exc), "traceback": traceback.format_exc(), "url": str(request.url)}
-    )
 
 def get_conn():
+    conn = db.connect()
     try:
-        conn = db.connect()
-        try:
-            yield conn
-        finally:
-            conn.close()
-    except Exception as e:
-        yield e
+        yield conn
+    finally:
+        conn.close()
 
 
 def _records(df: pd.DataFrame) -> List[dict]:
@@ -497,11 +487,10 @@ def get_provenance(index_id: str, conn=Depends(get_conn)):
 @app.get("/v1/methodology", tags=["governance"])
 def get_methodology(conn=Depends(get_conn)):
     """Machine-readable method and weight versions in force."""
-    try:
-        cfg = db.load_config()
-        weights = db.build_weights(conn, cfg)
-        return {
-            **_meta(conn),
+    cfg = db.load_config()
+    weights = db.build_weights(conn, cfg)
+    return {
+        **_meta(conn),
         "elementary_formula": "Jevons (geometric mean of price relatives)",
         "elementary_rationale": ("MoSPI uses Jevons for CPI 2024; it satisfies time reversal "
                                  "and transitivity; fares are approximately lognormal."),
@@ -549,22 +538,13 @@ def get_methodology(conn=Depends(get_conn)):
         },
         "personal_data": "None collected, stored or inferred. DPDP Act, 2023 does not attach.",
     }
-    except Exception as e:
-        import traceback
-        return {"status": "error", "error": str(e), "traceback": traceback.format_exc()}
 
 
 @app.get("/health", tags=["ops"])
 def health(conn=Depends(get_conn)):
-    if isinstance(conn, Exception):
-        return {"status": "error", "error_type": "db_connect", "error": str(conn), "db_path": str(db.db_path()), "exists": db.db_path().exists()}
-    try:
-        return {"status": "ok", "quotes": db.table_count(conn, "fact_fare_quote"),
-                "index_values": db.table_count(conn, "fact_index_value"),
-                "ledger_records": db.table_count(conn, "ledger_provenance")}
-    except Exception as e:
-        import traceback
-        return {"status": "error", "error": str(e), "traceback": traceback.format_exc(), "db_path": str(db.db_path()), "exists": db.db_path().exists()}
+    return {"status": "ok", "quotes": db.table_count(conn, "fact_fare_quote"),
+            "index_values": db.table_count(conn, "fact_index_value"),
+            "ledger_records": db.table_count(conn, "ledger_provenance")}
 
 
 DASHBOARD = ROOT / "dashboard"
@@ -577,36 +557,3 @@ def root():
     return HTMLResponse(
         '<meta http-equiv="refresh" content="0; url=/dashboard/">'
         '<p>APIx. <a href="/dashboard/">Dashboard</a> | <a href="/docs">API docs</a></p>')
-
-@app.get("/debug", tags=["ops"])
-def debug(conn=Depends(get_conn)):
-    import os
-    from apix_store import db
-    data_dir = str(db.DATA_DIR)
-    config_dir = str(db.CONFIG_DIR)
-    
-    data_files = []
-    if os.path.exists(data_dir):
-        data_files = os.listdir(data_dir)
-        
-    config_files = []
-    if os.path.exists(config_dir):
-        config_files = os.listdir(config_dir)
-        
-    conn_type = str(type(conn))
-    conn_str = str(conn) if isinstance(conn, Exception) else "connected"
-    
-    return {
-        "cwd": os.getcwd(),
-        "__file__": __file__,
-        "data_dir": data_dir,
-        "data_files": data_files,
-        "config_dir": config_dir,
-        "config_files": config_files,
-        "db_path": str(db.db_path()),
-        "db_exists": db.db_path().exists(),
-        "is_writable": os.access(db.db_path().parent, os.W_OK),
-        "conn_type": conn_type,
-        "conn_error": conn_str
-    }
-

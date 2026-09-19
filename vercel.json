@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "src/apix_api/main.py": {
-      "includeFiles": "**/*"
-    }
-  }
-}

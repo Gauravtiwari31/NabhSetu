@@ -551,10 +551,11 @@ async function loadCoverage(){
     const health = await get("/health");
     const meta = await get("/v1/methodology");
     if(meta.is_synthetic){
-      const b = el("synthetic-banner"); b.hidden = false;
-      b.textContent = "⚠ SYNTHETIC DATA — these charts are computed from the deterministic "+
-        "simulator, not from collected fares. They demonstrate the method. They are NOT a "+
-        "measurement of Indian airfares.";
+      // Banner disabled as requested
+      // const b = el("synthetic-banner"); b.hidden = false;
+      // b.textContent = "⚠ SYNTHETIC DATA — these charts are computed from the deterministic "+
+      //   "simulator, not from collected fares. They demonstrate the method. They are NOT a "+
+      //   "measurement of Indian airfares.";
     }
     // The collected routes are the basket minus the ones the coverage ledger
     // reports as uncollected. Deriving it this way rather than hard-coding a
