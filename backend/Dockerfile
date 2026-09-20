@@ -14,10 +14,9 @@ COPY config /app/config
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
 
-RUN pip install --upgrade pip && pip install .
+RUN pip install --upgrade pip && pip install ".[live]" && playwright install --with-deps chromium
 
 FROM base AS worker
-RUN pip install ".[live]" && playwright install --with-deps chromium
 CMD ["python", "-m", "app.worker.runner"]
 
 FROM base AS api
