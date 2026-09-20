@@ -140,6 +140,23 @@ Laptop one-cell demo (EaseMyTrip DEL-BOM T+7, then publish):
 python scripts/live_demo.py
 ```
 
+## Dashboard Screenshots
+
+- **Index Graph**: Visualizing the computed Airfare Price Index.
+  ![Index Graph](public/index_graph.png)
+- **Route Heat Map**: Highlighting fare intensities across routes.
+  ![Route Heat Map](public/heat_map.png)
+- **Fare Elasticity**: Exploring price changes by lead time.
+  ![Fare Elasticity](public/elasticity.png)
+- **Fare Drill-down**: Detailed inspection of individual routes.
+  ![Fare Drill-down](public/fare_drill.png)
+- **Data Collector**: The live acquisition engine interface.
+  ![Data Collector](public/collector.png)
+- **Source Health**: Reliability and compliance metrics for OTAs.
+  ![Source Health](public/source_health.png)
+- **Methodology**: Technical index computation formulas.
+  ![Methodology](public/methodology.png)
+
 ## Documentation
 
 - [Architecture](docs/architecture.md)
