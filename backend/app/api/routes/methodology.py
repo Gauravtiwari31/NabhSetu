@@ -32,7 +32,7 @@ async def methodology(settings: Settings = Depends(get_settings)) -> Methodology
         apw_windows=list(config.apw_windows),
         n_min=config.n_min,
         notes=[
-            "APIx-T is a traveller-paid Jevons elementary index with Young aggregation.",
+            "Nabhsetu-T is a traveller-paid Jevons elementary index with Young aggregation.",
             "Late entrants are not chain-linked; unmatched cells are suppressed.",
             "Availability adjustment blends matched and lowest-available-fare indices.",
             "Official DGCA/CPI figures are imported from checksummed public files only.",
@@ -50,7 +50,7 @@ async def basket(
     payload = load_basket(settings)
     return BasketResponse(
         version=payload.get("version") if row is None else row.version,
-        name=payload.get("name", "APIx basket") if row is None else row.name,
+        name=payload.get("name", "Nabhsetu basket") if row is None else row.name,
         routes=list(payload.get("routes") or []) if row is None else list(row.routes_json or []),
         lead_windows=list(payload.get("lead_windows") or []) if row is None else list(row.lead_windows_json or []),
         carriers=list(payload.get("carriers") or []) if row is None else list(row.carriers_json or []),

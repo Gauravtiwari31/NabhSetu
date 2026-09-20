@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import re
-from datetime import UTC, date, datetime, time
+from datetime import timezone, date, datetime, time
 from decimal import Decimal
-from typing import Any, Self
+from typing import Any
+from typing_extensions import Self
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -35,15 +36,15 @@ CURRENCY = re.compile(r"^[A-Z]{3}$")
 
 
 def utcnow() -> datetime:
-    return datetime.now(UTC)
+    return datetime.now(timezone.utc)
 
 
 def ensure_utc(value: datetime | None) -> datetime | None:
     if value is None:
         return None
     if value.tzinfo is None:
-        return value.replace(tzinfo=UTC)
-    return value.astimezone(UTC)
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 class StrictModel(BaseModel):

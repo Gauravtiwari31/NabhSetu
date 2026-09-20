@@ -1,4 +1,4 @@
-"""One-cell live demo: EaseMyTrip DEL-BOM T+7, then publish APIx-T.
+"""One-cell live demo: EaseMyTrip DEL-BOM T+7, then publish Nabhsetu-T.
 
 Does not fabricate fares. A blocked or empty source is recorded as-is.
 """

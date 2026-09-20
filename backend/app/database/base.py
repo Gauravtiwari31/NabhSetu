@@ -2,4 +2,4 @@ from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """SQLAlchemy declarative base for APIx models."""
+    """SQLAlchemy declarative base for Nabhsetu models."""

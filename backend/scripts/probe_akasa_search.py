@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 from playwright.async_api import async_playwright
 
-UA = "APIx-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)"
+UA = "Nabhsetu-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)"
 OUT = Path("data/akasa-search-probe.json")
 TRAVEL = date(2026, 9, 27)
 

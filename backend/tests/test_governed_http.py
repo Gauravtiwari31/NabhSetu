@@ -19,7 +19,7 @@ from app.services.seeding import MOCK_SOURCE_ID
 def _settings() -> Settings:
     return Settings(
         data_mode="live",
-        identified_user_agent="APIx-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)",
+        identified_user_agent="Nabhsetu-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)",
         http_timeout_seconds=5,
         http_connect_timeout_seconds=2,
     )

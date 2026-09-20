@@ -1,4 +1,4 @@
-"""Pure APIx statistical engine.
+"""Pure Nabhsetu statistical engine.
 
 This package must not import FastAPI, collectors, SQLAlchemy sessions, or
 network code.

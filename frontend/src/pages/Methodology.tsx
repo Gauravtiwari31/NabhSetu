@@ -36,7 +36,7 @@ export function MethodologyPage() {
       <div className="grid">
         <div className="card">
           <h3>
-            APIx-{method?.variant ?? "T"} · {method?.basis ?? "book"}
+            Nabhsetu-{method?.variant ?? "T"} · {method?.basis ?? "book"}
           </h3>
           <p>
             Omega preset <strong>{method?.omega_preset ?? "—"}</strong> · n_min {method?.n_min ?? "—"}

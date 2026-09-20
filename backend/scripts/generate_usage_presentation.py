@@ -9,7 +9,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-OUTPUT = REPO_ROOT / "docs" / "APIx-Project-Usage-Guide.pptx"
+OUTPUT = REPO_ROOT / "docs" / "Nabhsetu-Project-Usage-Guide.pptx"
 
 W = Inches(13.333)
 H = Inches(7.5)
@@ -250,7 +250,7 @@ def base_slide(prs: Presentation, title: str, kicker: str, number: int):
     add_rect(slide, Inches(0.64), Inches(1.22), Inches(0.72), Inches(0.055), SAFFRON)
     add_text(
         slide,
-        "APIx • SIH26056 • 20 Sep 2026",
+        "Nabhsetu • SIH26056 • 20 Sep 2026",
         Inches(0.66),
         Inches(7.13),
         Inches(5.4),
@@ -277,10 +277,10 @@ def build_presentation() -> Presentation:
     prs = Presentation()
     prs.slide_width = W
     prs.slide_height = H
-    prs.core_properties.title = "APIx — System built and setup completed"
+    prs.core_properties.title = "Nabhsetu — System built and setup completed"
     prs.core_properties.subject = "SIH26056 Real-Time Airfare Price Index for India"
-    prs.core_properties.author = "APIx — SIH 2026"
-    prs.core_properties.keywords = "APIx, SIH26056, MoSPI, airfare index, compliance, live"
+    prs.core_properties.author = "Nabhsetu — SIH 2026"
+    prs.core_properties.keywords = "Nabhsetu, SIH26056, MoSPI, airfare index, compliance, live"
 
     # 1 Cover
     slide = prs.slides.add_slide(prs.slide_layouts[6])
@@ -290,7 +290,7 @@ def build_presentation() -> Presentation:
     add_rect(slide, 0, 0, Inches(0.13), H, TEAL)
     add_rect(slide, Inches(0.13), 0, Inches(0.055), H, SAFFRON)
     add_pill(slide, "SIH 2026  •  PS SIH26056  •  MoSPI", Inches(0.72), Inches(0.7), Inches(3.55), fill=NAVY_2, color="9DE8E8")
-    add_text(slide, "APIx", Inches(0.72), Inches(1.45), Inches(8.0), Inches(0.95), size=52, color=WHITE, bold=True)
+    add_text(slide, "Nabhsetu", Inches(0.72), Inches(1.45), Inches(8.0), Inches(0.95), size=52, color=WHITE, bold=True)
     add_text(
         slide,
         "Real-Time Airfare Price Index for India",
@@ -317,11 +317,11 @@ def build_presentation() -> Presentation:
         [("Compliance-first", TEAL), ("Live + mock isolated", BLUE), ("Honest coverage", SAFFRON)]
     ):
         add_pill(slide, label, Inches(0.72 + i * 2.35), Inches(4.45), Inches(2.2), fill=NAVY_2, color=color, size=11)
-    add_text(slide, "Companion: docs/APIx-Project-Usage-Guide.md", Inches(0.72), Inches(6.55), Inches(7.5), Inches(0.3), size=13, color="8EA6C0", font="Consolas")
+    add_text(slide, "Companion: docs/Nabhsetu-Project-Usage-Guide.md", Inches(0.72), Inches(6.55), Inches(7.5), Inches(0.3), size=13, color="8EA6C0", font="Consolas")
     add_text(slide, "20 SEPTEMBER 2026", Inches(0.72), Inches(6.95), Inches(3.2), Inches(0.28), size=11, color="8EA6C0", bold=True)
 
     # 2 Problem and product
-    slide = base_slide(prs, "Problem statement and what APIx delivers", "Product", 2)
+    slide = base_slide(prs, "Problem statement and what Nabhsetu delivers", "Product", 2)
     add_card(
         slide,
         Inches(0.64),
@@ -331,7 +331,7 @@ def build_presentation() -> Presentation:
         title="SIH26056 asks for",
         body=(
             "A near-real-time airfare price index for India: scrape permitted "
-            "airline/OTA fares, clean and normalise them, compute APIx at daily / "
+            "airline/OTA fares, clean and normalise them, compute Nabhsetu at daily / "
             "weekly / monthly frequencies for city-pairs and T+1/7/15/30/45, expose "
             "a dashboard and NSO/RBI API, and support a 30-day DGCA back-test.\n\n"
             "Hard constraint: no CAPTCHA solving, stealth, auth bypass, rotate-on-block, "
@@ -351,7 +351,7 @@ def build_presentation() -> Presentation:
         body=(
             "A greenfield platform at the repo root. Team_Tarang_SIH-26-main is "
             "reference-only and is not imported.\n\n"
-            "Governed collectors, immutable ledger, versioned APIx-T engine, "
+            "Governed collectors, immutable ledger, versioned Nabhsetu-T engine, "
             "authenticated /v1 APIs, React operator dashboard, Docker mock + live "
             "overlay, and a live EaseMyTrip demonstration cell — with mock always "
             "labelled simulated and never mixed into a live series."
@@ -387,14 +387,14 @@ def build_presentation() -> Presentation:
         )
 
     # 4 Pipeline
-    slide = base_slide(prs, "End-to-end path: query to published APIx-T", "Architecture", 4)
+    slide = base_slide(prs, "End-to-end path: query to published Nabhsetu-T", "Architecture", 4)
     steps = [
         ("1", "FareQuery", "City-pair, T+ window, source"),
         ("2", "Governor", "ALLOW / DENY / REVIEW"),
         ("3", "Collectors", "HTTP then Playwright"),
         ("4", "Ledger", "Immutable + hashes"),
         ("5", "Quality", "ACCEPTED / WINSORISED"),
-        ("6", "Engine", "Jevons → Young → APIx-T"),
+        ("6", "Engine", "Jevons → Young → Nabhsetu-T"),
     ]
     for idx, (num, title, body) in enumerate(steps):
         x = Inches(0.55 + idx * 2.12)
@@ -562,14 +562,14 @@ def build_presentation() -> Presentation:
         Inches(12.05),
         Inches(1.7),
         title="Identified User-Agent (never spoof a consumer browser)",
-        body="APIx-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)",
+        body="Nabhsetu-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)",
         accent=NAVY,
         fill=PALE,
         body_size=15,
     )
 
     # 8 Index math
-    slide = base_slide(prs, "APIx-T methodology v1.0.0", "Index", 8)
+    slide = base_slide(prs, "Nabhsetu-T methodology v1.0.0", "Index", 8)
     add_card(
         slide,
         Inches(0.64),
@@ -637,7 +637,7 @@ def build_presentation() -> Presentation:
             "ACCEPTED — enters the index.\n"
             "WINSORISED — Tukey/Hampel adjusted; still publishable.\n"
             "QUARANTINED — sold-out, stale, or suspect; kept in the ledger.\n"
-            "EXCLUDED — does not enter APIx-T.\n\n"
+            "EXCLUDED — does not enter Nabhsetu-T.\n\n"
             "Live and mock series are selected by data mode. They are never blended."
         ),
         accent=SAFFRON,
@@ -716,7 +716,7 @@ def build_presentation() -> Presentation:
         body=(
             "Amber banner: SIMULATED DATA — not measurements of Indian airfares.\n\n"
             "docker compose up --build with APIX_DATA_MODE=mock.\n\n"
-            "Use only when live sites are unreachable. Never present mock numbers as official APIx."
+            "Use only when live sites are unreachable. Never present mock numbers as official Nabhsetu."
         ),
         accent=AMBER,
         fill=PALE_AMBER,
@@ -754,7 +754,7 @@ def build_presentation() -> Presentation:
             "EaseMyTrip DEL–BOM T+7\n"
             "130 live observations\n"
             "0 simulated\n"
-            "APIx-T 100.00\n"
+            "Nabhsetu-T 100.00\n"
             "Coverage 24%\n"
             "First period base = 100\n\n"
             "Dashboard :5173  •  API :8000"
@@ -871,7 +871,7 @@ def build_presentation() -> Presentation:
     # 17 Gaps
     slide = base_slide(prs, "Honest remaining gaps — say these to judges", "Boundaries", 17)
     gaps = [
-        ("30-day series", "A one-cell live collect is not a month of APIx-T."),
+        ("30-day series", "A one-cell live collect is not a month of Nabhsetu-T."),
         ("DGCA / CPI files", "Back-test stays unavailable until checksummed public files are imported."),
         ("SIH portal pack", "Idea PPT template, 3–5 min video, team ID, public GitHub, consent."),
         ("Full basket", "Five routes × five windows; one cell is ~24% coverage."),
@@ -900,13 +900,13 @@ def build_presentation() -> Presentation:
     bg.fill.solid()
     bg.fill.fore_color.rgb = rgb(NAVY)
     add_rect(slide, 0, 0, W, Inches(0.12), TEAL)
-    add_text(slide, "Ready to demonstrate APIx", Inches(0.8), Inches(0.7), Inches(11.5), Inches(0.7), size=32, color=WHITE, bold=True)
+    add_text(slide, "Ready to demonstrate Nabhsetu", Inches(0.8), Inches(0.7), Inches(11.5), Inches(0.7), size=32, color=WHITE, bold=True)
     add_text(slide, "Live, labelled, fail-closed — coverage and denials are features", Inches(0.82), Inches(1.45), Inches(11), Inches(0.4), size=16, color="A9BED3")
     checklist = [
         ("1", "Start live mode"),
         ("2", "Show EaseMyTrip success"),
         ("3", "Explain policy_denied"),
-        ("4", "Publish APIx-T 100"),
+        ("4", "Publish Nabhsetu-T 100"),
         ("5", "Show hashes + 24%"),
         ("6", "State remaining gaps"),
     ]
@@ -919,7 +919,7 @@ def build_presentation() -> Presentation:
         add_text(slide, label, x + Inches(0.78), y + Inches(0.35), Inches(2.55), Inches(0.45), size=16, color=WHITE, bold=True)
     add_text(
         slide,
-        "docs/APIx-Project-Usage-Guide.md   •   docs/APIx-Project-Usage-Guide.pptx   •   http://localhost:5173",
+        "docs/Nabhsetu-Project-Usage-Guide.md   •   docs/Nabhsetu-Project-Usage-Guide.pptx   •   http://localhost:5173",
         Inches(0.84),
         Inches(5.45),
         Inches(11.5),
@@ -930,7 +930,7 @@ def build_presentation() -> Presentation:
     )
     add_text(
         slide,
-        "APIx  •  Real-Time Airfare Price Index for India  •  SIH26056",
+        "Nabhsetu  •  Real-Time Airfare Price Index for India  •  SIH26056",
         Inches(0.84),
         Inches(6.7),
         Inches(11),

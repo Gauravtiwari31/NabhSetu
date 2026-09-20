@@ -30,7 +30,7 @@ export function OverviewPage() {
     <section>
       <header className="page-head">
         <div>
-          <h2>APIx-T daily index</h2>
+          <h2>Nabhsetu-T daily index</h2>
           <p className="muted">Traveller-paid Jevons elementary index with Young aggregation. First published period is 100.</p>
         </div>
       </header>
@@ -66,7 +66,7 @@ export function OverviewPage() {
               <YAxis domain={["auto", "auto"]} />
               <Tooltip formatter={(value) => formatIndex(Number(value))} />
               <Legend />
-              <Line type="monotone" dataKey="value" name="APIx-T" stroke="#0b2545" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="value" name="Nabhsetu-T" stroke="#0b2545" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="ci_low" name="CI low" stroke="#7aa2d4" dot={false} />
               <Line type="monotone" dataKey="ci_high" name="CI high" stroke="#7aa2d4" dot={false} />
             </LineChart>

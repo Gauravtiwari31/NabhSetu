@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import timezone, datetime, timedelta
 
 import pytest
 
@@ -82,7 +82,7 @@ async def test_open_captcha_circuit_is_not_retried(container) -> None:
     stats = source.adapter_stats[0]
     stats.circuit_state = CircuitState.OPEN
     stats.last_failure_kind = CollectionStatus.CAPTCHA_BLOCKED
-    stats.cooldown_until = datetime.now(UTC) + timedelta(hours=1)
+    stats.cooldown_until = datetime.now(timezone.utc) + timedelta(hours=1)
     result = await container.governor.evaluate(
         source, make_query(), adapter=stats.adapter
     )

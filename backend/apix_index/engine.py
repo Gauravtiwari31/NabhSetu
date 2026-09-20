@@ -1,4 +1,4 @@
-"""APIx index engine: quotes + weights + method config -> published numbers."""
+"""Nabhsetu index engine: quotes + weights + method config -> published numbers."""
 
 from __future__ import annotations
 

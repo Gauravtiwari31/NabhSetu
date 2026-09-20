@@ -30,7 +30,7 @@ class IndexPublisher:
         basket = await self.publications.add_basket(
             BasketVersion(
                 version=str(basket_payload.get("version", "basket-1.0.0")),
-                name=str(basket_payload.get("name", "APIx basket")),
+                name=str(basket_payload.get("name", "Nabhsetu basket")),
                 method_version="1.0.0",
                 routes_json=list(basket_payload.get("routes") or []),
                 lead_windows_json=list(basket_payload.get("lead_windows") or []),

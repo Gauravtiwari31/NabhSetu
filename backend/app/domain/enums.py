@@ -1,9 +1,9 @@
 """Shared acquisition and fare-observation enumerations."""
 
-from enum import StrEnum
+from enum import Enum
 
 
-class CollectorModality(StrEnum):
+class CollectorModality(str, Enum):
     PUBLIC_API = "public_api"
     STRUCTURED_FEED = "structured_feed"
     STATIC_HTML = "static_html"
@@ -15,7 +15,7 @@ class CollectorModality(StrEnum):
     MOCK = "mock"
 
 
-class CollectionStatus(StrEnum):
+class CollectionStatus(str, Enum):
     SUCCESS = "success"
     NO_RESULTS = "no_results"
     TEMPORARY_FAILURE = "temporary_failure"
@@ -30,69 +30,69 @@ class CollectionStatus(StrEnum):
     INVALID_DATA = "invalid_data"
 
 
-class ComplianceDecision(StrEnum):
+class ComplianceDecision(str, Enum):
     ALLOW = "allow"
     DENY = "deny"
     REVIEW_REQUIRED = "review_required"
 
 
-class AvailabilityState(StrEnum):
+class AvailabilityState(str, Enum):
     AVAILABLE = "available"
     LIMITED = "limited"
     SOLD_OUT = "sold_out"
     UNKNOWN = "unknown"
 
 
-class ValidationDisposition(StrEnum):
+class ValidationDisposition(str, Enum):
     VALID = "valid"
     FLAGGED = "flagged"
     EXCLUDED = "excluded"
 
 
-class PublicationDisposition(StrEnum):
+class PublicationDisposition(str, Enum):
     ACCEPTED = "accepted"
     WINSORISED = "winsorised"
     QUARANTINED = "quarantined"
     EXCLUDED = "excluded"
 
 
-class IndexFrequency(StrEnum):
+class IndexFrequency(str, Enum):
     DAILY = "daily"
     WEEKLY = "weekly"
     MONTHLY = "monthly"
 
 
-class IndexBasis(StrEnum):
+class IndexBasis(str, Enum):
     BOOK = "book"
     TRAVEL = "travel"
 
 
-class IndexVariant(StrEnum):
+class IndexVariant(str, Enum):
     T = "T"
     B = "B"
     A = "A"
 
 
-class IndexRunStatus(StrEnum):
+class IndexRunStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
 
 
-class BacktestStatus(StrEnum):
+class BacktestStatus(str, Enum):
     REPORTABLE = "reportable"
     NOT_REPORTABLE = "not_reportable"
     UNAVAILABLE = "unavailable"
 
 
-class CircuitState(StrEnum):
+class CircuitState(str, Enum):
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
 
 
-class EgressMode(StrEnum):
+class EgressMode(str, Enum):
     DIRECT = "direct"
     STATIC_PROXY = "static_proxy"
     PROXY_POOL = "proxy_pool"
@@ -100,7 +100,7 @@ class EgressMode(StrEnum):
     FAILOVER = "failover"
 
 
-class RotationStrategy(StrEnum):
+class RotationStrategy(str, Enum):
     NONE = "none"
     ROUND_ROBIN = "round_robin"
     HEALTH_BASED = "health_based"
@@ -109,7 +109,7 @@ class RotationStrategy(StrEnum):
     SESSION_STICKY = "session_sticky"
 
 
-class NetworkFailureCategory(StrEnum):
+class NetworkFailureCategory(str, Enum):
     NONE = "none"
     EGRESS_UNHEALTHY = "egress_unhealthy"
     DEAD_PROXY = "dead_proxy"
@@ -119,7 +119,7 @@ class NetworkFailureCategory(StrEnum):
     SOURCE_RESTRICTION = "source_restriction"
 
 
-class SourceType(StrEnum):
+class SourceType(str, Enum):
     AIRLINE = "airline"
     OTA = "ota"
     GOVERNMENT = "government"
@@ -127,7 +127,7 @@ class SourceType(StrEnum):
     MOCK = "mock"
 
 
-class ReviewStatus(StrEnum):
+class ReviewStatus(str, Enum):
     UNKNOWN = "unknown"
     APPROVED = "approved"
     DENIED = "denied"
@@ -135,14 +135,14 @@ class ReviewStatus(StrEnum):
     REVIEW_REQUIRED = "review_required"
 
 
-class RobotsStatus(StrEnum):
+class RobotsStatus(str, Enum):
     UNKNOWN = "unknown"
     ALLOWED = "allowed"
     DISALLOWED = "disallowed"
     UNREADABLE = "unreadable"
 
 
-class JobStatus(StrEnum):
+class JobStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -150,7 +150,7 @@ class JobStatus(StrEnum):
     FAILED = "failed"
 
 
-class HttpResponseCategory(StrEnum):
+class HttpResponseCategory(str, Enum):
     NONE = "none"
     HTTP_2XX = "http_2xx"
     HTTP_429 = "http_429"

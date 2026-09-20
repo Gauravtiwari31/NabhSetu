@@ -16,7 +16,7 @@ export function ElasticityPage() {
         <div>
           <h2>Lead-time elasticity</h2>
           <p className="muted">
-            Log-log elasticity of APIx-T across official T+ windows. Negative values mean cheaper fares further from
+            Log-log elasticity of Nabhsetu-T across official T+ windows. Negative values mean cheaper fares further from
             departure.
           </p>
         </div>

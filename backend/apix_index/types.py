@@ -1,4 +1,4 @@
-"""Pure types for the APIx statistical engine.
+"""Pure types for the Nabhsetu statistical engine.
 
 This package has no I/O, database, network, or clock. The same quotes, weights,
 and method config must always produce the same numbers.

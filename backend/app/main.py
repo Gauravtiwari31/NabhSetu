@@ -57,7 +57,7 @@ def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
         version="1.0.0",
-        description="APIx airfare price index. Mock observations and published series are labelled as simulated.",
+        description="Nabhsetu airfare price index. Mock observations and published series are labelled as simulated.",
         lifespan=lifespan,
     )
     application.add_middleware(

@@ -1,8 +1,8 @@
-# APIx — Real-Time Airfare Price Index for India
+# Nabhsetu — Real-Time Airfare Price Index for India
 
 **SIH 2026 · Problem Statement SIH26056**
 
-APIx is a compliance-first platform for collecting permitted airfare
+Nabhsetu is a compliance-first platform for collecting permitted airfare
 observations and constructing a near-real-time Airfare Price Index for India.
 This repository is a **greenfield** implementation. The earlier prototype under
 `Team_Tarang_SIH-26-main/` is reference-only and is not imported.
@@ -18,7 +18,7 @@ This repository is a **greenfield** implementation. The earlier prototype under
 6. `MockFareSource` remains isolated and always labels fixtures as simulated.
 7. Observations are stored immutably with SHA-256 provenance and `supersedes_id` corrections.
 8. The quality gate maps quotes to `ACCEPTED` / `WINSORISED` / `QUARANTINED` / `EXCLUDED`.
-9. `apix_index` publishes versioned APIx-T daily/weekly/monthly series (Jevons, availability, Young).
+9. `apix_index` publishes versioned Nabhsetu-T daily/weekly/monthly series (Jevons, availability, Young).
 10. Authenticated `/v1` APIs serve NSO/RBI consumers (JSON, CSV, SDMX-JSON).
 11. Scheduler, collection worker, and index publisher run from the Postgres job queue.
 12. The React dashboard shows trend, heatmap, elasticity, source health, collection, methodology, and back-test panels.
@@ -152,8 +152,8 @@ python scripts/live_demo.py
 - [OTA source review](docs/ota-source-review.md)
 - [DGCA import](docs/dgca-import.md)
 - [Back-test honesty](docs/backtest-honesty.md)
-- [Complete project usage guide](docs/APIx-Project-Usage-Guide.md)
-- [Project usage presentation](docs/APIx-Project-Usage-Guide.pptx)
+- [Complete project usage guide](docs/Nabhsetu-Project-Usage-Guide.md)
+- [Project usage presentation](docs/Nabhsetu-Project-Usage-Guide.pptx)
 - [Deployment](docs/deployment.md)
 - [SIH demo](docs/sih-demo.md)
 - [Operations](docs/operations.md)

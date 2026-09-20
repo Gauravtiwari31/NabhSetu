@@ -17,7 +17,7 @@ export default function App() {
         <nav>
           <div className="brand">
             <div className="brand-kicker">SIH 2026 · SIH26056</div>
-            <h1>APIx</h1>
+            <h1>Nabhsetu</h1>
             <p>MoSPI real-time airfare price index</p>
           </div>
           <NavLink to="/" end>

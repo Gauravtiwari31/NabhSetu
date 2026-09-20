@@ -1,4 +1,4 @@
-"""Quality-gate observations and publish versioned APIx series."""
+"""Quality-gate observations and publish versioned Nabhsetu series."""
 
 from __future__ import annotations
 

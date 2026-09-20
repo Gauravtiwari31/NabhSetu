@@ -1,17 +1,17 @@
 from decimal import Decimal
-from enum import StrEnum
+from enum import Enum
 from functools import lru_cache
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class DataMode(StrEnum):
+class DataMode(str, Enum):
     MOCK = "mock"
     LIVE = "live"
 
 
-class EgressMode(StrEnum):
+class EgressMode(str, Enum):
     DIRECT = "direct"
     STATIC_PROXY = "static_proxy"
     PROXY_POOL = "proxy_pool"
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = "APIx Backend"
+    app_name: str = "Nabhsetu Backend"
     environment: str = "development"
     log_level: str = "INFO"
     data_mode: DataMode = DataMode.MOCK
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     robots_review_max_age_days: int = Field(default=30, ge=1)
 
     identified_user_agent: str = (
-        "APIx-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)"
+        "Nabhsetu-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)"
     )
     http_timeout_seconds: float = Field(default=20.0, ge=1)
     http_connect_timeout_seconds: float = Field(default=10.0, ge=1)

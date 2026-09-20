@@ -80,7 +80,7 @@ def compare_monthly(
             run_id=run_id,
             comparator=comparator,
             status=BacktestStatus.NOT_REPORTABLE,
-            notes="Monthly APIx values are not available for an official comparison.",
+            notes="Monthly Nabhsetu values are not available for an official comparison.",
             details_json={"reason": "missing_monthly_apix"},
             computed_at=utcnow(),
         )

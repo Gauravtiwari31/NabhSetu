@@ -1,4 +1,4 @@
-# APIx dashboard
+# Nabhsetu dashboard
 
 React + TypeScript operator UI for SIH26056. Every page inherits a persistent
 banner for mock, live, or policy-denied data.

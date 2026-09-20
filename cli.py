@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""APIx command line.
+"""Nabhsetu command line.
 
     python cli.py init                       create the schema and seed dimensions
     python cli.py backfill --days 90         build a quote history (synthetic rung)
@@ -96,7 +96,7 @@ def cmd_index(args):
     print(f"quality           {q['n_passed']}/{q['n_checks']} passed"
           + (f"  BLOCKING: {q['blocking']}" if q["blocking"] else "")
           + (f"  alerts: {q['alerts']}" if q["alerts"] else ""))
-    key = f"APIx-{cfg['method']['headline_variant']}|book|{cfg['method']['default_omega_preset']}"
+    key = f"Nabhsetu-{cfg['method']['headline_variant']}|book|{cfg['method']['default_omega_preset']}"
     res = out["results"].get(key)
     if res is not None:
         h = res.headline
@@ -258,7 +258,7 @@ def _apix_monthly(conn, basis="travel", variant="T", preset=None):
     return pd.read_sql_query(
         "SELECT period, value FROM fact_index_value WHERE index_code=? AND "
         "frequency='monthly' AND basis=? AND omega_preset=? ORDER BY period",
-        conn, params=[f"APIx-{variant}", basis, preset])
+        conn, params=[f"Nabhsetu-{variant}", basis, preset])
 
 
 def cmd_backtest(args):
@@ -268,7 +268,7 @@ def cmd_backtest(args):
 
     apix = _apix_monthly(conn, basis=args.basis, variant=args.variant)
     if apix.empty:
-        print("no monthly APIx series; run `python cli.py index` first")
+        print("no monthly Nabhsetu series; run `python cli.py index` first")
         return 1
     syn = bool(conn.execute("SELECT MAX(is_synthetic) s FROM fact_index_value").fetchone()["s"])
 
@@ -280,12 +280,12 @@ def cmd_backtest(args):
     level = "division" if args.base_year == 2024 else "subgroup"
     name = (f"CPI-{args.base_year} {cpi.TRANSPORT_LABEL[args.base_year]} "
             f"(All India, Combined)")
-    res = backtest.run(conn, apix, comp, apix_code=f"APIx-{args.variant}",
+    res = backtest.run(conn, apix, comp, apix_code=f"Nabhsetu-{args.variant}",
                        apix_basis=args.basis, comparator_name=name,
                        comparator_level=level, is_synthetic=syn)
 
-    print(f"back-test: APIx-{args.variant} ({args.basis} basis)  vs  {name}")
-    print(f"  APIx span       {res['apix_range']}")
+    print(f"back-test: Nabhsetu-{args.variant} ({args.basis} basis)  vs  {name}")
+    print(f"  Nabhsetu span       {res['apix_range']}")
     print(f"  comparator span {res['comparator_range']}")
     print(f"  overlapping months: {res['n_overlapping_months']}")
     for c in res["caveats"]:
@@ -301,7 +301,7 @@ def cmd_backtest(args):
         b = res["best_lag"]
         print(f"\n  strongest cross-correlation at lag {b['lag_months']:+d} months "
               f"(r={b['corr']:.4f}, n={b['n']})")
-        print("   (positive lag = APIx moves first)")
+        print("   (positive lag = Nabhsetu moves first)")
     return 0
 
 
@@ -312,7 +312,7 @@ def cmd_nowcast(args):
 
     apix = _apix_monthly(conn, basis=args.basis)
     if apix.empty:
-        print("no monthly APIx series; run `python cli.py index` first")
+        print("no monthly Nabhsetu series; run `python cli.py index` first")
         return 1
     syn = bool(conn.execute("SELECT MAX(is_synthetic) s FROM fact_index_value").fetchone()["s"])
 
@@ -334,7 +334,7 @@ def cmd_nowcast(args):
         for k, v in fit.oos.items():
             print(f"    {k}: {v}")
     g = nowcast.granger_causality(design)
-    print("\n  Granger causality (APIx -> CPI transport):")
+    print("\n  Granger causality (Nabhsetu -> CPI transport):")
     for k, v in g.items():
         print(f"    {k}: {v}")
     if not fit.interpretable:

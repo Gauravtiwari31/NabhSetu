@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import timezone, date, datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -40,7 +40,7 @@ def test_money_fields_reject_negatives() -> None:
             source="MockFareSource",
             source_type=SourceType.MOCK,
             collector=CollectorModality.MOCK,
-            collected_at=datetime(2026, 9, 20, 12, 0, 0, tzinfo=UTC),
+            collected_at=datetime(2026, 9, 20, 12, 0, 0, tzinfo=timezone.utc),
             origin_airport="DEL",
             destination_airport="BOM",
             travel_date=date(2026, 9, 27),
@@ -56,7 +56,7 @@ def test_money_fields_reject_negatives() -> None:
 
 
 def test_duplicate_key_is_stable_inside_a_time_bucket() -> None:
-    collected = datetime(2026, 9, 20, 12, 0, 5, tzinfo=UTC)
+    collected = datetime(2026, 9, 20, 12, 0, 5, tzinfo=timezone.utc)
     first = CanonicalFareObservation(
         source="MockFareSource",
         source_type=SourceType.MOCK,

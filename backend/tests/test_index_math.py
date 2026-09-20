@@ -1,4 +1,4 @@
-"""Unit and property tests for Decimal-stable APIx arithmetic."""
+"""Unit and property tests for Decimal-stable Nabhsetu arithmetic."""
 
 from __future__ import annotations
 
