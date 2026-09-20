@@ -10,10 +10,7 @@ import sys
 # Append backend to path so 'app' imports work
 sys.path.insert(0, os.path.abspath('backend'))
 
-# Set env vars to connect to Render and enable Live mode
-os.environ.setdefault("APIX_DATA_MODE", "live")
-os.environ.setdefault("APIX_DATABASE_URL", "postgresql://<YOUR_USER>:<YOUR_PASSWORD>@<YOUR_HOST>/<YOUR_DB>")
-os.environ.setdefault("APIX_API_KEY", "change-me")
+# Load env vars from .env file directly
 
 from app.acquisition.orchestrator import LiveRunOrchestrator
 from app.config.settings import get_settings
