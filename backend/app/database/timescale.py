@@ -16,10 +16,16 @@ HYPERTABLES = (
 def install_hypertables(bind: Connection) -> None:
     if bind.dialect.name != "postgresql":
         return
-    bind.execute(text("CREATE EXTENSION IF NOT EXISTS timescaledb"))
-    for table, column in HYPERTABLES:
-        bind.execute(
-            text(
-                f"SELECT create_hypertable('{table}', '{column}', if_not_exists => TRUE)"
-            )
-        )
+    try:
+        bind.execute(text("CREATE EXTENSION IF NOT EXISTS timescaledb"))
+        for table, column in HYPERTABLES:
+            try:
+                bind.execute(
+                    text(
+                        f"SELECT create_hypertable('{table}', '{column}', if_not_exists => TRUE)"
+                    )
+                )
+            except Exception as e:
+                print(f"Skipping hypertable {table}: {e}")
+    except Exception as e:
+        print(f"TimescaleDB extension not available or failed: {e}")
