@@ -68,6 +68,11 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     application.add_middleware(RequestLoggingMiddleware)
+
+    @application.get("/health", tags=["system"])
+    def health_check():
+        return {"status": "ok"}
+
     application.include_router(api_router)
     return application
 
