@@ -1,24 +1,131 @@
 services:
-  apix:
-    build: .
-    ports: ["8000:8000"]
-    volumes:
-      - ./data:/app/data
-      - ./config:/app/config:ro
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
     environment:
-      APIX_DB: /app/data/apix.db
+      POSTGRES_USER: apix
+      POSTGRES_PASSWORD: apix
+      POSTGRES_DB: apix
+    ports:
+      - "5432:5432"
+    volumes:
+      - apix_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apix -d apix"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
 
-  # One-shot: cold machine -> published index. Run before `up`.
-  #   docker compose run --rm seed
-  seed:
-    build: .
-    volumes:
-      - ./data:/app/data
-      - ./config:/app/config:ro
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    ports:
+      - "8000:8000"
     environment:
-      APIX_DB: /app/data/apix.db
-    command: >
-      sh -c "python cli.py init &&
-             python cli.py backfill --days 120 &&
-             python cli.py index &&
-             python cli.py status"
+      APIX_APP_NAME: APIx Backend
+      APIX_ENVIRONMENT: docker
+      APIX_LOG_LEVEL: INFO
+      APIX_DATA_MODE: mock
+      APIX_EGRESS_MODE: direct
+      APIX_DATABASE_URL: postgresql+asyncpg://apix:apix@timescaledb:5432/apix
+      APIX_API_KEY: change-me
+      APIX_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    command: ["python", "-m", "app.worker.scheduler"]
+    environment:
+      APIX_ENVIRONMENT: docker
+      APIX_LOG_LEVEL: INFO
+      APIX_DATA_MODE: mock
+      APIX_EGRESS_MODE: direct
+      APIX_DATABASE_URL: postgresql+asyncpg://apix:apix@timescaledb:5432/apix
+      APIX_API_KEY: change-me
+      APIX_SCHEDULER_INTERVAL_SECONDS: "300"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/tmp/apix-healthy').exists() else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+  collection-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    command: ["python", "-m", "app.worker.runner"]
+    environment:
+      APIX_ENVIRONMENT: docker
+      APIX_LOG_LEVEL: INFO
+      APIX_DATA_MODE: mock
+      APIX_EGRESS_MODE: direct
+      APIX_DATABASE_URL: postgresql+asyncpg://apix:apix@timescaledb:5432/apix
+      APIX_API_KEY: change-me
+      APIX_WORKER_POLL_SECONDS: "2"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/tmp/apix-healthy').exists() else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+  publisher:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    command: ["python", "-m", "app.worker.publisher"]
+    environment:
+      APIX_ENVIRONMENT: docker
+      APIX_LOG_LEVEL: INFO
+      APIX_DATA_MODE: mock
+      APIX_EGRESS_MODE: direct
+      APIX_DATABASE_URL: postgresql+asyncpg://apix:apix@timescaledb:5432/apix
+      APIX_API_KEY: change-me
+      APIX_PUBLISHER_INTERVAL_SECONDS: "60"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "from pathlib import Path; raise SystemExit(0 if Path('/tmp/apix-healthy').exists() else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+  dashboard:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE: http://localhost:8000
+      VITE_API_KEY: change-me
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+
+volumes:
+  apix_pgdata:

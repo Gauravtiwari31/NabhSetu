@@ -1,0 +1,40 @@
+version: "weights-seed-1.0.0"
+source: "equal_seed"
+notes: "Equal route and carrier shares until a DGCA traffic file is imported."
+route_weights:
+  DEL-BOM: 0.24
+  BOM-DEL: 0.24
+  DEL-BLR: 0.20
+  BOM-BLR: 0.18
+  DEL-HYD: 0.14
+carrier_weights:
+  DEL-BOM:
+    "6E": 0.40
+    AI: 0.25
+    QP: 0.15
+    IX: 0.10
+    SG: 0.10
+  BOM-DEL:
+    "6E": 0.40
+    AI: 0.25
+    QP: 0.15
+    IX: 0.10
+    SG: 0.10
+  DEL-BLR:
+    "6E": 0.45
+    AI: 0.25
+    QP: 0.15
+    IX: 0.10
+    SG: 0.05
+  BOM-BLR:
+    "6E": 0.40
+    AI: 0.25
+    QP: 0.20
+    IX: 0.10
+    SG: 0.05
+  DEL-HYD:
+    "6E": 0.40
+    AI: 0.30
+    QP: 0.15
+    IX: 0.10
+    SG: 0.05

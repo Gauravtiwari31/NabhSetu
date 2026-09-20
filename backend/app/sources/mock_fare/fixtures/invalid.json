@@ -1,0 +1,12 @@
+[
+  {
+    "carrier": "6E",
+    "flight_number": "6E209",
+    "origin": "DEL",
+    "destination": "BOM",
+    "cabin": "ECONOMY",
+    "base_fare": "-10.00",
+    "total_fare": "100.00",
+    "currency": "INR"
+  }
+]

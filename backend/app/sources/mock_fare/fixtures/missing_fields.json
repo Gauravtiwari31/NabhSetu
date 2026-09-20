@@ -1,0 +1,12 @@
+[
+  {
+    "carrier": "6E",
+    "flight_number": "6E205",
+    "origin": "DEL",
+    "destination": "BOM",
+    "cabin": "ECONOMY",
+    "total_fare": "6100.00",
+    "currency": "INR",
+    "availability": "UNKNOWN"
+  }
+]

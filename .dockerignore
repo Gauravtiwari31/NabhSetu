@@ -1,0 +1,14 @@
+.git
+**/.venv
+**/venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/node_modules
+**/.env
+Team_Tarang_SIH-26-main
+frontend
+docs
+*.md
+.cursor

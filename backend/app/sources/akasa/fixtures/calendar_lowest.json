@@ -1,0 +1,1 @@
+{"url": "https://prod-bl.qp.akasaair.com/api/ibe/availability/v2/search?origin=DEL&destination=BOM&startDate=2026-09-27T01%3A52%3A48%2B05%3A30&numberOfPassengers=1&channel=WEB&currencyCode=INR", "data": [{"date": "2026-09-27T00:00:00", "isLowest": true, "noFlights": false, "price": 6530.0, "soldOut": false}]}

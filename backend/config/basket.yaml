@@ -1,0 +1,16 @@
+version: "basket-1.0.0"
+name: "APIx domestic representative basket"
+notes: "Seed basket for SIH26056. Replace with PSD-signed weights when supplied."
+routes:
+  - DEL-BOM
+  - BOM-DEL
+  - DEL-BLR
+  - BOM-BLR
+  - DEL-HYD
+lead_windows: [1, 7, 15, 30, 45]
+carriers:
+  - "6E"
+  - "AI"
+  - "IX"
+  - "QP"
+  - "SG"

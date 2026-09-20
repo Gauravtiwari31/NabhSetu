@@ -1,0 +1,11 @@
+{
+  "origin": "DEL",
+  "destination": "BOM",
+  "travel_date": "2026-09-27",
+  "page_url": "https://www.easemytrip.com/flight-search/listing?srch=DEL-Delhi-India%7CBOM-Mumbai-India%7C27%2F09%2F2026&px=1-0-0&curr=INR",
+  "dom_records": [
+    "Air India Express\nIX-1165\n05:45\nNew Delhi(DEL)\n05h 20m\n1 Stop\n11:05\nMumbai(BOM)\n₹6,245\nBook Now\nLock Price ₹313\n9 Seats Left\nEASEFLY: Get extra Rs.550 instant discount on this flight\nFlight Details",
+    "AkasaAir\nQP-1110\n10:30\nNew Delhi(DEL)\n02h 15m\nNonstop\n12:45\nMumbai(BOM)\n₹6,530\nBook Now\nLock Price ₹327\n9 Seats Left\nBOOKNOW: Get extra Rs.220 instant discount on this flight\nFlight Details",
+    "SpiceJet\nSG- 162\n19:55\nNew Delhi(DEL)\n02h 45m\nNonstop\n22:40\nMumbai(BOM)\n₹6,292\nBook Now\nLock Price ₹315\nFlight Details"
+  ]
+}

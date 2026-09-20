@@ -1,0 +1,53 @@
+# Overlay: live collection without mixing mock fares into the published series.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.live.yml up --build
+#
+# The scheduler is opt-in (--profile live-schedule) so a demo start does not
+# fire the full basket against live sites. Collect from the dashboard instead.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: worker
+    command: ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    shm_size: "1gb"
+    environment:
+      APIX_DATA_MODE: live
+      APIX_ENVIRONMENT: live
+      APIX_PLAYWRIGHT_TIMEOUT_MS: "60000"
+      APIX_MAX_ADAPTER_RETRIES: "0"
+      APIX_COMPLIANCE_LEASE_SECONDS: "180"
+      APIX_HTTP_TIMEOUT_SECONDS: "45"
+      APIX_LIVE_PAYLOAD_MAX_BYTES: "2097152"
+
+  scheduler:
+    profiles: ["live-schedule"]
+    environment:
+      APIX_DATA_MODE: live
+      APIX_ENVIRONMENT: live
+      APIX_SCHEDULER_INTERVAL_SECONDS: "86400"
+      APIX_SCHEDULER_SOURCE_NAMES: EaseMyTrip
+      APIX_PLAYWRIGHT_TIMEOUT_MS: "60000"
+      APIX_MAX_ADAPTER_RETRIES: "0"
+      APIX_COMPLIANCE_LEASE_SECONDS: "180"
+
+  collection-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: worker
+    shm_size: "1gb"
+    environment:
+      APIX_DATA_MODE: live
+      APIX_ENVIRONMENT: live
+      APIX_PLAYWRIGHT_TIMEOUT_MS: "60000"
+      APIX_MAX_ADAPTER_RETRIES: "0"
+      APIX_COMPLIANCE_LEASE_SECONDS: "180"
+      APIX_HTTP_TIMEOUT_SECONDS: "45"
+      APIX_LIVE_PAYLOAD_MAX_BYTES: "2097152"
+
+  publisher:
+    environment:
+      APIX_DATA_MODE: live
+      APIX_ENVIRONMENT: live
