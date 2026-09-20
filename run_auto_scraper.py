@@ -10,7 +10,9 @@ import sys
 # Append backend to path so 'app' imports work
 sys.path.insert(0, os.path.abspath('backend'))
 
-# Load env vars from .env file directly
+# Force load from .env ignoring poisoned shell variables
+from dotenv import load_dotenv
+load_dotenv(override=True)
 
 from app.acquisition.orchestrator import LiveRunOrchestrator
 from app.config.settings import get_settings
@@ -69,7 +71,9 @@ async def run_cycle():
             append_to_csv(records, "live_fares.csv")
             return records
     except Exception as e:
-        print(f"Error during scraping cycle: {e}")
+        import traceback
+        print(f"Error during scraping cycle:")
+        traceback.print_exc()
     finally:
         if browser is not None:
             await browser.close()
