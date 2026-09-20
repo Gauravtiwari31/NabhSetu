@@ -66,12 +66,7 @@ class CollectionService:
         profile = await self.router.registry.resolve_source(None, query.source_id)
         if profile is None or profile.source_type == SourceType.MOCK:
             return
-        stale = profile.robots_status == RobotsStatus.UNKNOWN or profile.robots_checked_at is None
-        if profile.robots_checked_at is not None:
-            age = utcnow() - profile.robots_checked_at
-            stale = stale or age > timedelta(days=self.settings.robots_review_max_age_days)
-        if not stale:
-            return
+        # Always fetch robots.txt for live jobs to ensure a snapshot is bound.
         snapshot = await fetch_robots(self.settings, profile.base_url)
         await self.router.registry.sources.apply_robots_snapshot(
             profile.id,
