@@ -36,6 +36,12 @@ def create_engine_from_settings(settings: Settings, *, echo: bool = False) -> As
         kwargs["connect_args"] = {"check_same_thread": False}
         kwargs["poolclass"] = StaticPool
         kwargs.pop("pool_pre_ping", None)
+    elif "render.com" in url or "ssl=require" in url:
+        import ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        kwargs["connect_args"] = {"ssl": ctx}
     return create_async_engine(url, **kwargs)
 
 
