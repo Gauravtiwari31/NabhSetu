@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from apix_store import db  # noqa: E402
+from apix_store.errors import OperatorError  # noqa: E402
 
 # The demo basket: the six sectors the PS names, both directions. The full
 # 60-route basket stays configured in config/basket.yaml and is what the
@@ -55,7 +56,11 @@ def cmd_init(args):
 
 def cmd_backfill(args):
     from apix_collect import runner
-    cfg = db.load_config()
+    cfg = db.load_config(enable_simulator=args.simulate)
+    if args.simulate:
+        print("SIMULATOR ENABLED: every quote below is generated, stamped "
+              "is_synthetic=1, and must be watermarked SYNTHETIC wherever it "
+              "is charted. This is not a measurement of Indian airfares.\n")
     conn = _conn()
     routes = None if args.all_routes else DEMO_ROUTES
     end = date.fromisoformat(args.end) if args.end else date.today()
@@ -96,7 +101,7 @@ def cmd_index(args):
     print(f"quality           {q['n_passed']}/{q['n_checks']} passed"
           + (f"  BLOCKING: {q['blocking']}" if q["blocking"] else "")
           + (f"  alerts: {q['alerts']}" if q["alerts"] else ""))
-    key = f"Nabhsetu-{cfg['method']['headline_variant']}|book|{cfg['method']['default_omega_preset']}"
+    key = f"APIx-{cfg['method']['headline_variant']}|book|{cfg['method']['default_omega_preset']}"
     res = out["results"].get(key)
     if res is not None:
         h = res.headline
@@ -258,34 +263,72 @@ def _apix_monthly(conn, basis="travel", variant="T", preset=None):
     return pd.read_sql_query(
         "SELECT period, value FROM fact_index_value WHERE index_code=? AND "
         "frequency='monthly' AND basis=? AND omega_preset=? ORDER BY period",
-        conn, params=[f"Nabhsetu-{variant}", basis, preset])
+        conn, params=[f"APIx-{variant}", basis, preset])
+
+
+def cmd_load_dgca(args):
+    from apix_reference import dgca
+    conn = _conn()
+    summary = dgca.load_dgca(conn, args.path, source_url=args.source_url)
+    if summary.get("skipped"):
+        print(f"skipped: {summary['skipped']}")
+        return 1
+    print(f"loaded {summary['rows']} row(s) from {summary['file']}"
+          + (f", dropped {summary['dropped']} unparseable" if summary.get("dropped") else ""))
+    print(f"  sha256      {summary['sha256'][:32]}...")
+    print(f"  source_url  {summary['source_url'] or '(none)'}")
+    if summary["is_placeholder"]:
+        print("\n  FLAGGED AS PLACEHOLDER: loaded without --source-url, so these rows "
+              "are excluded\n  from the back-test. Reload with the official download URL "
+              "to make them usable.")
+    return 0
 
 
 def cmd_backtest(args):
     from apix_pipeline import backtest
-    from apix_reference import cpi
+    from apix_reference import cpi, dgca
     conn = _conn()
 
     apix = _apix_monthly(conn, basis=args.basis, variant=args.variant)
     if apix.empty:
-        print("no monthly Nabhsetu series; run `python cli.py index` first")
+        print("no monthly APIx series; run `python cli.py index` first")
         return 1
     syn = bool(conn.execute("SELECT MAX(is_synthetic) s FROM fact_index_value").fetchone()["s"])
 
-    comp = cpi.transport_series(conn, base_year=args.base_year)
-    if comp.empty:
-        print(f"no CPI comparator for base {args.base_year}; run `python cli.py load-cpi`")
-        return 1
-
-    level = "division" if args.base_year == 2024 else "subgroup"
-    name = (f"CPI-{args.base_year} {cpi.TRANSPORT_LABEL[args.base_year]} "
-            f"(All India, Combined)")
-    res = backtest.run(conn, apix, comp, apix_code=f"Nabhsetu-{args.variant}",
+    if args.comparator == "dgca":
+        # The comparator the PS actually names. Placeholder rows -- anything
+        # loaded without a source URL -- are excluded, so a hand-made CSV
+        # cannot become a published agreement statistic by accident.
+        comp = dgca.dgca_series(conn, route=args.route)
+        if comp.empty:
+            held = dgca.provenance(conn)
+            placeholders = int(held["n_rows"].sum()) if not held.empty else 0
+            print("no usable DGCA comparator.")
+            if placeholders:
+                print(f"  {placeholders} row(s) are present but flagged as PLACEHOLDER "
+                      "(loaded without a --source-url).")
+                print("  Reload the official file with its download URL:")
+                print("    python cli.py load-dgca <file.csv> --source-url <url>")
+            else:
+                print("  Load one: python cli.py load-dgca <file.csv> --source-url <url>")
+            return 1
+        level = "item"
+        name = ("DGCA monthly average domestic fare"
+                + (f" ({args.route})" if args.route else " (basket mean)"))
+    else:
+        comp = cpi.transport_series(conn, base_year=args.base_year)
+        if comp.empty:
+            print(f"no CPI comparator for base {args.base_year}; run `python cli.py load-cpi`")
+            return 1
+        level = "division" if args.base_year == 2024 else "subgroup"
+        name = (f"CPI-{args.base_year} {cpi.TRANSPORT_LABEL[args.base_year]} "
+                f"(All India, Combined)")
+    res = backtest.run(conn, apix, comp, apix_code=f"APIx-{args.variant}",
                        apix_basis=args.basis, comparator_name=name,
                        comparator_level=level, is_synthetic=syn)
 
-    print(f"back-test: Nabhsetu-{args.variant} ({args.basis} basis)  vs  {name}")
-    print(f"  Nabhsetu span       {res['apix_range']}")
+    print(f"back-test: APIx-{args.variant} ({args.basis} basis)  vs  {name}")
+    print(f"  APIx span           {res['apix_range']}")
     print(f"  comparator span {res['comparator_range']}")
     print(f"  overlapping months: {res['n_overlapping_months']}")
     for c in res["caveats"]:
@@ -301,7 +344,7 @@ def cmd_backtest(args):
         b = res["best_lag"]
         print(f"\n  strongest cross-correlation at lag {b['lag_months']:+d} months "
               f"(r={b['corr']:.4f}, n={b['n']})")
-        print("   (positive lag = Nabhsetu moves first)")
+        print("   (positive lag = APIx moves first)")
     return 0
 
 
@@ -312,7 +355,7 @@ def cmd_nowcast(args):
 
     apix = _apix_monthly(conn, basis=args.basis)
     if apix.empty:
-        print("no monthly Nabhsetu series; run `python cli.py index` first")
+        print("no monthly APIx series; run `python cli.py index` first")
         return 1
     syn = bool(conn.execute("SELECT MAX(is_synthetic) s FROM fact_index_value").fetchone()["s"])
 
@@ -360,6 +403,9 @@ def main():
     b.add_argument("--days", type=int, default=90)
     b.add_argument("--end", type=str, default=None, help="YYYY-MM-DD, default today")
     b.add_argument("--all-routes", action="store_true", help="full basket, not the demo subset")
+    b.add_argument("--simulate", action="store_true",
+                   help="enable the synthetic rung for an offline run; every row "
+                        "is stamped is_synthetic=1")
     b.set_defaults(fn=cmd_backfill)
 
     i = sub.add_parser("index", help="compute and publish the index family")
@@ -382,7 +428,18 @@ def main():
     lc.add_argument("--dir", type=str, default="../Datasets")
     lc.set_defaults(fn=cmd_load_cpi)
 
-    bt = sub.add_parser("backtest", help="agreement statistics vs the CPI comparator")
+    ld = sub.add_parser("load-dgca", help="load a DGCA monthly average-fare CSV")
+    ld.add_argument("path", type=str, help="CSV with columns month, route, average_fare")
+    ld.add_argument("--source-url", type=str, default=None,
+                    help="the URL the file was downloaded from. WITHOUT it the rows "
+                         "load flagged as PLACEHOLDER and the back-test will not use them.")
+    ld.set_defaults(fn=cmd_load_dgca)
+
+    bt = sub.add_parser("backtest", help="agreement statistics vs an official comparator")
+    bt.add_argument("--comparator", type=str, default="cpi", choices=["cpi", "dgca"],
+                    help="dgca = DGCA monthly average fares (the comparator the PS names)")
+    bt.add_argument("--route", type=str, default=None,
+                    help="restrict a DGCA comparison to one route, e.g. DEL-BOM")
     bt.add_argument("--basis", type=str, default="travel", choices=["book", "travel"])
     bt.add_argument("--variant", type=str, default="T", choices=["B", "T", "A"])
     bt.add_argument("--base-year", type=int, default=2024, choices=[2010, 2012, 2024])
@@ -399,7 +456,14 @@ def main():
     s.set_defaults(fn=cmd_serve)
 
     args = p.parse_args()
-    sys.exit(args.fn(args) or 0)
+    # Operator-facing failures print as a message, not a traceback. A stack
+    # trace here reads as "the tool crashed" when the actual meaning is
+    # "the configuration refused to collect", which is a different fix.
+    try:
+        sys.exit(args.fn(args) or 0)
+    except OperatorError as exc:
+        print(f"\nERROR: {exc}", file=sys.stderr)
+        sys.exit(2)
 
 
 if __name__ == "__main__":

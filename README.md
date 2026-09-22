@@ -4,8 +4,10 @@
 
 Nabhsetu is a compliance-first platform for collecting permitted airfare
 observations and constructing a near-real-time Airfare Price Index for India.
-This repository is a **greenfield** implementation. The earlier prototype under
-`Team_Tarang_SIH-26-main/` is reference-only and is not imported.
+
+**Naming:** *Nabhsetu* is the platform. *APIx* is the index family it
+publishes — `APIx-B` (base fare + YQ/YR), `APIx-T` (traveller-paid, the
+headline) and `APIx-A` (all-in checkout). Index codes are always `APIx-*`.
 
 ## What the platform does
 
@@ -18,13 +20,16 @@ This repository is a **greenfield** implementation. The earlier prototype under
 6. `MockFareSource` remains isolated and always labels fixtures as simulated.
 7. Observations are stored immutably with SHA-256 provenance and `supersedes_id` corrections.
 8. The quality gate maps quotes to `ACCEPTED` / `WINSORISED` / `QUARANTINED` / `EXCLUDED`.
-9. `apix_index` publishes versioned Nabhsetu-T daily/weekly/monthly series (Jevons, availability, Young).
+9. `apix_index` publishes versioned APIx-T daily/weekly/monthly series (Jevons, availability, Young).
 10. Authenticated `/v1` APIs serve NSO/RBI consumers (JSON, CSV, SDMX-JSON).
 11. Scheduler, collection worker, and index publisher run from the Postgres job queue.
 12. The React dashboard shows trend, heatmap, elasticity, source health, collection, methodology, and back-test panels.
 
-Do not present mock numbers as measurements of Indian airfares. The dashboard
-banner states mock, live, or policy-denied on every page.
+Do not present mock numbers as measurements of Indian airfares. Both dashboards
+label simulated data: the React app carries a banner stating mock, live or
+policy-denied on every page, and the analyst dashboard shows a `SYNTHETIC`
+badge beside the headline plus a note in the chart footer, so a cropped
+screenshot of a chart still says what it is.
 
 ## Quick start (live presentation)
 
@@ -106,9 +111,55 @@ npm test
 Tests never contact live airline or OTA websites. Parsers are exercised against
 stored fixtures. Live collection scripts must be run explicitly.
 
+## Offline demo from a cold clone
+
+The repository ships without a database: `data/` and `Datasets/` are
+gitignored, so a fresh clone has no quotes and no reference series. Build a
+full history locally with the simulator:
+
+```bash
+make demo        # init + backfill (240 days, simulated) + index + status
+make serve       # http://127.0.0.1:8000/dashboard/
+```
+
+`make demo` is equivalent to:
+
+```bash
+python cli.py init
+python cli.py backfill --simulate --days 240 --end 2026-07-31
+python cli.py index
+```
+
+`--simulate` is **required**. The synthetic rung ships `enabled: false` in
+`config/sources.yaml` so it can never run in a deployment by accident; without
+the flag (or `APIX_ENABLE_SIMULATOR=1`) `backfill` refuses and names the rung
+that declined and why. Every simulated row is stamped `is_synthetic=1` and the
+API and dashboard label it all the way through. Do not present those numbers
+as measurements of Indian airfares.
+
 ## Official-file import and back-test
 
 Never paste fabricated DGCA/CPI numbers. Download a public file, then:
+
+```bash
+python cli.py load-cpi --dir Datasets                       # .xlsx or .csv
+python cli.py load-dgca path/to/dgca.csv \
+    --source-url https://official.example/file
+python cli.py index
+python cli.py backtest --comparator dgca                    # PS comparator
+python cli.py backtest --comparator cpi --basis book        # CPI Transport
+```
+
+DGCA rows loaded **without** `--source-url` are kept but flagged
+`is_placeholder=1`, and the back-test refuses to use them — a hand-made CSV
+cannot become a published agreement statistic by accident.
+
+The back-test needs at least 6 overlapping months and reports
+`reportable: false` with the reason below that, rather than a number nobody
+can interpret. It always prints its caveats, including whether the APIx side
+is synthetic.
+
+The equivalent commands on the `backend/` service:
 
 ```bash
 cd backend
@@ -117,9 +168,6 @@ python -m app.cli import-cpi path/to/cpi.csv --source-url https://official.examp
 python -m app.cli run-index
 python -m app.cli backtest --comparator dgca
 ```
-
-If the comparator or overlap is insufficient the back-test returns
-`unavailable` or `not_reportable`.
 
 ## Explicit live checks
 

@@ -102,13 +102,25 @@ def _tidy(df: pd.DataFrame, base_year: int, source_file: str) -> pd.DataFrame:
     return out
 
 
-def load_workbook(path: Path) -> pd.DataFrame:
-    """Read one CPI workbook and return it in tidy form."""
-    path = Path(path)
+def _sheets(path: Path) -> List[pd.DataFrame]:
+    """Every candidate table in a CPI release, whatever container it arrives in.
+
+    MoSPI publishes the same long-format extract as .xlsx and as .csv, and
+    which one you get depends on where you downloaded it. Only reading .xlsx
+    meant `load-cpi` failed on a directory of perfectly good CSVs, so accept
+    both. utf-8-sig because the CSV exports carry a BOM.
+    """
+    if path.suffix.lower() == ".csv":
+        return [pd.read_csv(path, encoding="utf-8-sig")]
     xl = pd.ExcelFile(path)
+    return [pd.read_excel(path, sheet_name=sheet) for sheet in xl.sheet_names]
+
+
+def load_workbook(path: Path) -> pd.DataFrame:
+    """Read one CPI release (.xlsx or .csv) and return it in tidy form."""
+    path = Path(path)
     frames: List[pd.DataFrame] = []
-    for sheet in xl.sheet_names:
-        df = pd.read_excel(path, sheet_name=sheet)
+    for df in _sheets(path):
         cols = {c.lower().strip(): c for c in df.columns.astype(str)}
         # Only the long-format sheets carry a usable classification. The
         # dashboard summary sheets are pivoted presentation tables and are
@@ -120,16 +132,17 @@ def load_workbook(path: Path) -> pd.DataFrame:
                                  errors="coerce").dropna().iloc[0])
         frames.append(_tidy(df, base, path.name))
     if not frames:
-        raise ValueError(f"{path.name}: no long-format sheet with the expected columns")
+        raise ValueError(f"{path.name}: no long-format table with the expected columns")
     return pd.concat(frames, ignore_index=True)
 
 
 def load_directory(conn: sqlite3.Connection, directory: Path) -> Dict[str, object]:
     """Load every CPI workbook in a directory into fact_cpi_reference."""
     directory = Path(directory)
-    files = sorted(p for p in directory.glob("*.xlsx") if not p.name.startswith("~$"))
+    files = sorted(p for pattern in ("*.xlsx", "*.csv")
+                   for p in directory.glob(pattern) if not p.name.startswith("~$"))
     if not files:
-        raise FileNotFoundError(f"no .xlsx files in {directory}")
+        raise FileNotFoundError(f"no .xlsx or .csv files in {directory}")
 
     now = datetime.now(timezone.utc).isoformat()
     summary = {"files": {}, "rows_loaded": 0, "skipped": []}

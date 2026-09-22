@@ -1,15 +1,15 @@
-# APIx Project Usage Guide
+# Nabhsetu Project Usage Guide
 
 **SIH 2026 · Problem Statement SIH26056**  
 Real-Time Airfare Price Index for India — Ministry of Statistics and Programme Implementation (MoSPI)
 
-This document explains the system that was built, how a fare becomes a published index point, how to run the completed setup, and how to read operator outcomes such as `policy_denied`. It is the companion to `docs/APIx-Project-Usage-Guide.pptx`.
+This document explains the system that was built, how a fare becomes a published index point, how to run the completed setup, and how to read operator outcomes such as `policy_denied`. It is the companion to `docs/Nabhsetu-Project-Usage-Guide.pptx`.
 
 ---
 
-## 1. What APIx is
+## 1. What Nabhsetu is
 
-APIx is a **compliance-first** platform that:
+Nabhsetu is a **compliance-first** platform that publishes the APIx airfare index. It:
 
 1. Collects **permitted** public airfare observations from Indian airline and OTA websites.
 2. Cleans, validates, and stores them in an **immutable** ledger with SHA-256 provenance.
@@ -19,7 +19,7 @@ APIx is a **compliance-first** platform that:
 
 It is a **greenfield** implementation at the repository root. The earlier prototype in `Team_Tarang_SIH-26-main/` is reference-only and is **not imported at runtime**.
 
-APIx never fabricates fares, never solves CAPTCHAs, never spoofs a browser fingerprint, never bypasses login, never rotates IPs after a block, and never substitutes mock numbers for a live source that was denied.
+Nabhsetu never fabricates fares, never solves CAPTCHAs, never spoofs a browser fingerprint, never bypasses login, never rotates IPs after a block, and never substitutes mock numbers for a live source that was denied.
 
 ---
 
@@ -146,7 +146,7 @@ Other result codes you may see:
 Identified User-Agent:
 
 ```
-APIx-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)
+Nabhsetu-Research-Bot/0.1 (+https://www.mospi.gov.in; SIH26056 airfare index research)
 ```
 
 ### OTAs
@@ -312,7 +312,7 @@ Or local SQLite with `APIX_DATA_MODE=mock`. Every fare and index point is labell
 | `APIX_API_KEY` | matches `VITE_API_KEY` | Restricts jobs, fares, `/v1` |
 | `APIX_DATABASE_URL` | SQLite or Postgres | Ledger |
 | `APIX_SCHEDULER_SOURCE_NAMES` | `EaseMyTrip` in overlay | Live allowlist |
-| `APIX_IDENTIFIED_USER_AGENT` | APIx-Research-Bot/0.1 … | Must not spoof a consumer browser |
+| `APIX_IDENTIFIED_USER_AGENT` | Nabhsetu-Research-Bot/0.1 … | Must not spoof a consumer browser |
 
 ---
 

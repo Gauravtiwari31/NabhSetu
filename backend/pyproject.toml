@@ -47,6 +47,10 @@ include = ["app*", "apix_index*"]
 addopts = "-q"
 testpaths = ["tests"]
 asyncio_mode = "auto"
+# Pinned rather than left to the default, which pytest-asyncio is changing in
+# a future release. Function scope is what these tests already assume: each
+# gets its own loop, so a session-scoped engine cannot leak between them.
+asyncio_default_fixture_loop_scope = "function"
 pythonpath = ["."]
 
 [tool.ruff]

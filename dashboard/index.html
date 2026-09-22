@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>APIx — Real-time Airfare Price Index for India</title>
+<title>Nabhsetu — Real-time Airfare Price Index (APIx) for India</title>
 <style>
   /* Colour-blind-safe (viridis-derived). No red/green pairs carry meaning.
      Contrast checked for WCAG 2.1 AA against the surfaces they sit on. */
@@ -20,6 +20,13 @@
   header h1{margin:0;font-size:20px;letter-spacing:.2px}
   header p{margin:4px 0 0;font-size:13px;color:#c9d6e8}
   .synthetic{background:#8a5a00;color:#fff;padding:8px 22px;font-size:13px;font-weight:600}
+  /* Inline provenance badge. The data being simulated is a property OF THE
+     NUMBER, so the label sits next to the number rather than in a page-wide
+     bar a reader scrolls past once and then forgets. */
+  .synth-pill{display:none;vertical-align:middle;margin-left:10px;padding:3px 9px;
+    border-radius:999px;background:#fdf0d5;color:#8a5a00;border:1px solid #e0b872;
+    font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+  body.is-synthetic .synth-pill{display:inline-block}
   main{padding:18px 22px 60px;max-width:1500px;margin:0 auto}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:8px;
         padding:16px;margin-bottom:18px}
@@ -59,7 +66,7 @@
 </head>
 <body>
 <header>
-  <h1>APIx — The Real-time Airfare Price Index for India</h1>
+  <h1>Nabhsetu — The Real-time Airfare Price Index (APIx) for India</h1>
   <p>SIH 2026 · PS 26056 · MoSPI Data Informatics &amp; Innovation Division — daily, route-level,
      lead-time-resolved, CPI-2024-native</p>
 </header>
@@ -67,7 +74,7 @@
 
 <main>
   <section class="card">
-    <h2>Headline index</h2>
+    <h2>Headline index<span class="synth-pill" title="Computed from the deterministic simulator, not from collected fares.">⚠ Synthetic</span></h2>
     <p class="sub">Jevons at the elementary level, Young/Modified&nbsp;Laspeyres above — the same
       machinery MoSPI adopted for CPI 2024, so this plugs into COICOP 07.3.3 without a
       methodological argument. Shaded band is a seeded flight-block bootstrap interval.</p>
@@ -332,7 +339,9 @@ async function loadHeadline(){
       ["Cells", headlineRows[headlineRows.length-1].n_cells ?? "—"]
     ].map(([l,x])=>`<div class="kpi"><div class="v">${x}</div><div class="l">${l}</div></div>`).join("");
     note.textContent = `Base period = 100. Uncertainty: ${d.uncertainty}. `+
-      `method ${d.method_version} · weights ${d.weights_version}`;
+      `method ${d.method_version} · weights ${d.weights_version}`+
+      (d.is_synthetic ? " · SYNTHETIC: simulator output, not a measurement of "+
+        "Indian airfares." : "");
     note.className = "note";
   }catch(e){ note.className="note warn"; note.textContent = "Could not load series: "+e.message; }
 }
@@ -539,8 +548,8 @@ async function loadCoverage(){
   const m = await get("/v1/methodology");
   el("policy-note").innerHTML =
     "<strong>Zero-Circumvention Policy.</strong> "+m.collection_policy.rationale+
-    "<br><br><strong>APIx will not:</strong> "+m.collection_policy.will_not.join("; ")+
-    ".<br><strong>APIx will:</strong> "+m.collection_policy.will.join("; ")+
+    "<br><br><strong>Nabhsetu will not:</strong> "+m.collection_policy.will_not.join("; ")+
+    ".<br><strong>Nabhsetu will:</strong> "+m.collection_policy.will.join("; ")+
     ".<br><br><strong>Personal data:</strong> "+m.personal_data;
   return d;
 }
@@ -551,11 +560,9 @@ async function loadCoverage(){
     const health = await get("/health");
     const meta = await get("/v1/methodology");
     if(meta.is_synthetic){
-      // Banner disabled as requested
-      // const b = el("synthetic-banner"); b.hidden = false;
-      // b.textContent = "⚠ SYNTHETIC DATA — these charts are computed from the deterministic "+
-      //   "simulator, not from collected fares. They demonstrate the method. They are NOT a "+
-      //   "measurement of Indian airfares.";
+      // Inline badges rather than the full-width bar: same statement, next to
+      // the numbers it qualifies, so it survives being cropped or screenshotted.
+      document.body.classList.add("is-synthetic");
     }
     // The collected routes are the basket minus the ones the coverage ledger
     // reports as uncollected. Deriving it this way rather than hard-coding a

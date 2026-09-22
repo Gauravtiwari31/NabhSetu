@@ -351,7 +351,7 @@ def build_presentation() -> Presentation:
         body=(
             "A greenfield platform at the repo root. Team_Tarang_SIH-26-main is "
             "reference-only and is not imported.\n\n"
-            "Governed collectors, immutable ledger, versioned Nabhsetu-T engine, "
+            "Governed collectors, immutable ledger, versioned APIx-T engine, "
             "authenticated /v1 APIs, React operator dashboard, Docker mock + live "
             "overlay, and a live EaseMyTrip demonstration cell — with mock always "
             "labelled simulated and never mixed into a live series."
@@ -387,14 +387,14 @@ def build_presentation() -> Presentation:
         )
 
     # 4 Pipeline
-    slide = base_slide(prs, "End-to-end path: query to published Nabhsetu-T", "Architecture", 4)
+    slide = base_slide(prs, "End-to-end path: query to published APIx-T", "Architecture", 4)
     steps = [
         ("1", "FareQuery", "City-pair, T+ window, source"),
         ("2", "Governor", "ALLOW / DENY / REVIEW"),
         ("3", "Collectors", "HTTP then Playwright"),
         ("4", "Ledger", "Immutable + hashes"),
         ("5", "Quality", "ACCEPTED / WINSORISED"),
-        ("6", "Engine", "Jevons → Young → Nabhsetu-T"),
+        ("6", "Engine", "Jevons → Young → APIx-T"),
     ]
     for idx, (num, title, body) in enumerate(steps):
         x = Inches(0.55 + idx * 2.12)
@@ -569,7 +569,7 @@ def build_presentation() -> Presentation:
     )
 
     # 8 Index math
-    slide = base_slide(prs, "Nabhsetu-T methodology v1.0.0", "Index", 8)
+    slide = base_slide(prs, "APIx-T methodology v1.0.0", "Index", 8)
     add_card(
         slide,
         Inches(0.64),
@@ -637,7 +637,7 @@ def build_presentation() -> Presentation:
             "ACCEPTED — enters the index.\n"
             "WINSORISED — Tukey/Hampel adjusted; still publishable.\n"
             "QUARANTINED — sold-out, stale, or suspect; kept in the ledger.\n"
-            "EXCLUDED — does not enter Nabhsetu-T.\n\n"
+            "EXCLUDED — does not enter APIx-T.\n\n"
             "Live and mock series are selected by data mode. They are never blended."
         ),
         accent=SAFFRON,
@@ -754,7 +754,7 @@ def build_presentation() -> Presentation:
             "EaseMyTrip DEL–BOM T+7\n"
             "130 live observations\n"
             "0 simulated\n"
-            "Nabhsetu-T 100.00\n"
+            "APIx-T 100.00\n"
             "Coverage 24%\n"
             "First period base = 100\n\n"
             "Dashboard :5173  •  API :8000"
@@ -871,7 +871,7 @@ def build_presentation() -> Presentation:
     # 17 Gaps
     slide = base_slide(prs, "Honest remaining gaps — say these to judges", "Boundaries", 17)
     gaps = [
-        ("30-day series", "A one-cell live collect is not a month of Nabhsetu-T."),
+        ("30-day series", "A one-cell live collect is not a month of APIx-T."),
         ("DGCA / CPI files", "Back-test stays unavailable until checksummed public files are imported."),
         ("SIH portal pack", "Idea PPT template, 3–5 min video, team ID, public GitHub, consent."),
         ("Full basket", "Five routes × five windows; one cell is ~24% coverage."),
@@ -906,7 +906,7 @@ def build_presentation() -> Presentation:
         ("1", "Start live mode"),
         ("2", "Show EaseMyTrip success"),
         ("3", "Explain policy_denied"),
-        ("4", "Publish Nabhsetu-T 100"),
+        ("4", "Publish APIx-T 100"),
         ("5", "Show hashes + 24%"),
         ("6", "State remaining gaps"),
     ]

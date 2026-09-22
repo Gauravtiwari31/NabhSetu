@@ -23,26 +23,43 @@ from app.services.seeding import seed_if_needed
 ROUTES = [("DEL", "BOM"), ("BOM", "BLR"), ("DEL", "BLR")]
 
 def append_to_csv(records, filename="live_fares.csv"):
+    """Append this cycle's fares to the CSV export.
+
+    The header is taken from the union of every row's keys, not from the first
+    row, so an optional field that happens to be absent from the first fare
+    cannot silently drop that column for the whole file. If the file already
+    exists with a different header, the rows go to a new timestamped file
+    rather than being written under the wrong columns -- an append that
+    silently misaligns is worse than a second file.
+    """
     if not records:
         return
-    
-    file_exists = os.path.isfile(filename)
-    
+
     all_fares = []
     for r in records:
         if r.status == 'success' and hasattr(r, 'fares'):
-            for fare_dict in r.fares:
-                all_fares.append(fare_dict)
-    
+            all_fares.extend(r.fares)
+
     if not all_fares:
         return
-        
+
+    fieldnames = list(dict.fromkeys(k for row in all_fares for k in row))
+
+    if os.path.isfile(filename):
+        with open(filename, 'r', newline='', encoding='utf-8') as f:
+            existing = next(csv.reader(f), None)
+        if existing and existing != fieldnames:
+            stamp = time.strftime('%Y%m%dT%H%M%S')
+            filename = f"{os.path.splitext(filename)[0]}_{stamp}.csv"
+            print(f"--> Export schema changed; writing to {filename} instead")
+
+    file_exists = os.path.isfile(filename)
     with open(filename, 'a', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=list(all_fares[0].keys()))
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
         if not file_exists:
             writer.writeheader()
         writer.writerows(all_fares)
-        print(f"--> Saved {len(all_fares)} individual fares to {filename}")
+    print(f"--> Saved {len(all_fares)} individual fares to {filename}")
 
 async def run_cycle():
     settings = get_settings()

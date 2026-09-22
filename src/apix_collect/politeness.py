@@ -111,7 +111,7 @@ class PolitenessGovernor:
     kill switch -- in one place, so the policy is auditable as a single object."""
 
     def __init__(self, config: Dict[str, object], robots_fetcher=None):
-        self.user_agent = str(config.get("user_agent", "APIx-Research/1.0"))
+        self.user_agent = str(config.get("user_agent", "Nabhsetu-Research/1.0"))
         self.respect_robots = bool(config.get("respect_robots", True))
         self.default_delay = float(config.get("default_crawl_delay_s", 10.0))
         self.jitter = float(config.get("jitter_s", 2.0))

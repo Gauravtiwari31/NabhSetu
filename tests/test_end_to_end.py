@@ -26,7 +26,10 @@ DAYS = 12
 def built(tmp_path_factory):
     """Collect a short history and publish an index, once for the module."""
     path = tmp_path_factory.mktemp("e2e") / "apix.db"
-    cfg = db.load_config()
+    # The simulator ships disabled so it cannot run in a deployment by
+    # accident. The end-to-end test is exactly the case that needs it, so it
+    # opts in explicitly rather than the shipped config being loosened.
+    cfg = db.load_config(enable_simulator=True)
     conn = db.connect(path)
     db.init_schema(conn)
     db.seed_dimensions(conn, cfg)

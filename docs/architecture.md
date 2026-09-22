@@ -1,6 +1,6 @@
 # Architecture
 
-APIx is a modular monolith. Collection workers, the API, the index publisher,
+Nabhsetu is a modular monolith. Collection workers, the API, the index publisher,
 and the operator dashboard share one PostgreSQL/Timescale database. Browser and
 HTTP collectors are plugins behind a single router; they are not a scrape
 waterfall.

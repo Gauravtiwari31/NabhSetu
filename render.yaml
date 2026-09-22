@@ -1,0 +1,47 @@
+# Render Blueprint for Nabhsetu.
+#
+# Apply with: Render Dashboard -> Blueprints -> New Blueprint Instance, pointed
+# at this repository. Existing dashboard-created services keep their own
+# settings; see docs/deployment.md for the equivalent manual configuration.
+
+services:
+  # ---------------------------------------------------------------- frontend
+  - type: web
+    name: nabhsetu-tarang-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE
+        sync: false
+      - key: VITE_API_KEY
+        sync: false
+    # The SPA fallback. React Router owns /collection, /heatmap, /methodology
+    # and the rest; without this rule Render looks for a file at that path,
+    # finds none, and serves its own 404 on every reload or deep link.
+    # This must be the LAST route so real build assets still win.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ----------------------------------------------------------------- backend
+  - type: web
+    name: nabhsetu-tarang-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: APIX_DATABASE_URL
+        sync: false
+      - key: APIX_API_KEY
+        sync: false
+      - key: APIX_DATA_MODE
+        value: live
+      - key: APIX_EGRESS_MODE
+        value: direct
+      - key: APIX_CORS_ORIGINS
+        sync: false

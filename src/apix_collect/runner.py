@@ -18,8 +18,18 @@ from apix_collect.sources.synthetic import SyntheticConfig, SyntheticSource, def
 from apix_pipeline.clean import clean, disposition_summary
 from apix_pipeline.decompose import ChargeBook, decompose
 from apix_store import db
+from apix_store.errors import OperatorError
 
 IST = timezone(timedelta(hours=5, minutes=30))
+
+
+class NoQuotesCollected(OperatorError):
+    """Every rung refused, so the run produced nothing to index.
+
+    Raised instead of returning an empty result: a silent zero-row backfill
+    reads as success and only fails later, in the indexer, where the cause is
+    no longer visible.
+    """
 
 
 def new_run_id(tag: str = "collect") -> str:
@@ -215,6 +225,25 @@ def backfill(conn, cfg: Dict, start: date, end: date, run_id: Optional[str] = No
         if progress:
             progress(summary)
         d += timedelta(days=1)
+
+    # A backfill that stores nothing is a configuration problem, not a result.
+    # It used to return quietly and the failure only surfaced much later as
+    # "no quotes in the store" from the indexer, which points at the wrong
+    # place. Fail here, and say which rung refused and why.
+    if out and not any(s["n_stored"] for s in out):
+        reasons = sorted({
+            f"{name}={info['outcome']}"
+            for summary in out
+            for name, info in summary["sources"].items()
+        })
+        raise NoQuotesCollected(
+            "backfill stored 0 quotes over "
+            f"{len(out)} day(s); every source refused: {', '.join(reasons)}. "
+            "The simulator rung is disabled by default -- pass --simulate "
+            "(CLI), enable_simulator=True (load_config) or set "
+            "APIX_ENABLE_SIMULATOR=1 for an offline run, or supply credentials "
+            "for a licensed API rung."
+        )
     return out
 
 

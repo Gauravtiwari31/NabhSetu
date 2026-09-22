@@ -85,7 +85,7 @@ async def export_sdmx(
                 }
             ],
             "structure": {
-                "name": "Nabhsetu-T Airfare Price Index",
+                "name": "APIx-T Airfare Price Index",
                 "dimensions": {
                     "observation": [{"id": "TIME_PERIOD", "values": [{"id": row.period.isoformat()} for row in rows]}]
                 },

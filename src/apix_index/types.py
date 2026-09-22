@@ -52,6 +52,16 @@ class MethodConfig:
     basis: Basis = "book"
     apply_availability_adjustment: bool = True
     apply_dow_smoothing: bool = True
+    # Reference period for the matched-model comparison. Left unset the engine
+    # picks the earliest BEST-COVERED period (see engine._choose_base_period).
+    # Pin it once a series is published: a base that moves as new data lands
+    # silently rewrites history, which an official index may not do.
+    base_period: Optional[str] = None
+    # A headline period must rest on at least this share of the lead-time
+    # weight vector to be published. Below it the number is arithmetically
+    # fine but is not the thing its label claims: it is one or two windows
+    # standing in for the whole booking curve.
+    min_omega_covered: float = 0.60
 
     def omega_vector(self) -> Dict[int, float]:
         """Lead-time weights, defaulting to uniform over the configured windows."""

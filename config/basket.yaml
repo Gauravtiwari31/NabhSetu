@@ -1,4 +1,4 @@
-# APIx route basket v1.
+# Nabhsetu route basket v1.
 #
 # DERIVED, not hard-coded (Part 5, section 2.1): rank all directional city-pairs
 # by annual passengers Q_r from AAI/DGCA sector data, take the top M such that

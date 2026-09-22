@@ -71,6 +71,44 @@ def _prepare(quotes: pd.DataFrame, config: MethodConfig) -> pd.DataFrame:
     return agg.drop(columns=["_log"]).reset_index()
 
 
+def _choose_base_period(df: pd.DataFrame, periods: list, config: MethodConfig) -> str:
+    """Pick the reference period the matched-model comparison runs against.
+
+    Taking `periods[0]` is wrong on the TRAVEL basis and was a real defect.
+    On that basis a period is a DEPARTURE date, and the earliest departure in
+    a panel can only ever have been observed at the shortest advance-purchase
+    window -- you cannot have seen a 2 August departure 45 days out if
+    collection started on 1 August. So the base held T+1 products only, every
+    T+7..T+45 cell failed to find a match in it and was suppressed, and the
+    published "headline" silently collapsed to the T+1 series with the omega
+    lead-time weights doing nothing at all.
+
+    So choose the EARLIEST period that carries the most distinct cells, which
+    is the earliest period the rest of the panel can actually be compared
+    against. On the book basis, where period is the collection date and day
+    one is already fully covered, this returns periods[0] exactly as before.
+
+    A pinned `config.base_period` always wins: once a series is published its
+    base must stop moving, or each new day of data rewrites the history.
+    """
+    if config.base_period:
+        if config.base_period not in set(periods):
+            raise ValueError(
+                f"pinned base_period {config.base_period!r} has no publishable "
+                f"quotes; available periods run {periods[0]} .. {periods[-1]}")
+        return config.base_period
+
+    # Rank periods by how many distinct advance-purchase windows they carry,
+    # because that is precisely what the defect destroys and what omega needs.
+    # Deliberately NOT "most cells": a single late-entering route would then
+    # drag the base to the end of the panel and change the matched set for
+    # every earlier period. Ties go to the oldest, so the base stays as early
+    # as it can be without being degenerate.
+    coverage = df.groupby("period")["apw_days"].nunique()
+    best = int(coverage.max())
+    return str(min(period for period, n in coverage.items() if int(n) == best))
+
+
 def _cell_indices(df: pd.DataFrame, config: MethodConfig):
     """Stage 1 plus availability, per cell per period, against the base period.
 
@@ -87,7 +125,7 @@ def _cell_indices(df: pd.DataFrame, config: MethodConfig):
     periods = sorted(df["period"].unique())
     if not periods:
         raise ValueError("no publishable quotes: nothing to index")
-    base = periods[0]
+    base = _choose_base_period(df, periods, config)
 
     work = df.copy()
     # Integer ids for the matching key and the flight, so joins are on ints.

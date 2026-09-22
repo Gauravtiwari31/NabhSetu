@@ -71,7 +71,7 @@ live sites are unreachable.
 
 A collection row such as DEL-BOM T+7 with status **denied**, result **policy_denied**, and label **live** is the governor stopping a disallowed source. It is not a scrape failure and is not filled with mock fares. Collect **EaseMyTrip** for a live success cell.
 
-Full system explanation, setup, and this table: [APIx Project Usage Guide](APIx-Project-Usage-Guide.md) and [presentation](APIx-Project-Usage-Guide.pptx).
+Full system explanation, setup, and this table: [Nabhsetu Project Usage Guide](Nabhsetu-Project-Usage-Guide.md) and [presentation](Nabhsetu-Project-Usage-Guide.pptx).
 
 ## What this demo is not
 

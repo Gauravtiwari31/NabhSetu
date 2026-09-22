@@ -5,7 +5,7 @@ technical collection-policy review, not legal advice. The runtime still
 fetches `robots.txt` before every live run and fails closed when it is
 unreadable.
 
-All live requests use the identified `APIx-Research-Bot/0.1` User-Agent,
+All live requests use the identified `Nabhsetu-Research-Bot/0.1` User-Agent,
 direct egress, one source request at a time, and source-specific delays.
 CAPTCHA, HTTP 403, and explicit access denial stop the source. The system does
 not solve challenges, spoof fingerprints, replay undocumented APIs, or rotate

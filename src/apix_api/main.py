@@ -1,4 +1,4 @@
-"""The APIx public API.
+"""The Nabhsetu public API.
 
 REST + SDMX-JSON. SDMX is the international standard for exchanging statistical
 data and metadata and is what statistical agencies and central banks actually
@@ -30,7 +30,7 @@ from fastapi.staticfiles import StaticFiles  # noqa: E402
 from apix_store import db  # noqa: E402
 
 app = FastAPI(
-    title="APIx -- Real-time Airfare Price Index for India",
+    title="Nabhsetu -- Real-time Airfare Price Index (APIx) for India",
     version="1.0.0",
     description=(
         "Daily, route-level, lead-time-resolved airfare price index, built on "
@@ -88,7 +88,7 @@ def _meta(conn: sqlite3.Connection) -> dict:
 def _series(conn, index_code: str, frequency: str, basis: str, preset: str,
             date_from: Optional[str], date_to: Optional[str]) -> pd.DataFrame:
     sql = ("SELECT index_id, period, value, se, ci_low, ci_high, n_quotes, n_cells, "
-           "coverage_pct, method_version, weights_version, is_synthetic "
+           "coverage_pct, omega_covered, method_version, weights_version, is_synthetic "
            "FROM fact_index_value WHERE index_code=? AND frequency=? AND basis=? "
            "AND omega_preset=?")
     params: List = [index_code, frequency, basis, preset]
@@ -111,7 +111,7 @@ def _sdmx(df: pd.DataFrame, index_code: str, frequency: str, basis: str, preset:
         "meta": {"schema": "https://raw.githubusercontent.com/sdmx-twg/sdmx-json/master/data-message/tools/schemas/1.0/sdmx-json-data-schema.json",
                  "id": f"APIX-{index_code}-{frequency}-{basis}-{preset}",
                  "prepared": pd.Timestamp.utcnow().isoformat(),
-                 "sender": {"id": "APIX", "name": "APIx Airfare Price Index"},
+                 "sender": {"id": "NABHSETU", "name": "Nabhsetu Airfare Price Index (APIx)"},
                  "extra": meta},
         "data": {
             "structure": {
@@ -556,4 +556,4 @@ if DASHBOARD.exists():
 def root():
     return HTMLResponse(
         '<meta http-equiv="refresh" content="0; url=/dashboard/">'
-        '<p>APIx. <a href="/dashboard/">Dashboard</a> | <a href="/docs">API docs</a></p>')
+        '<p>Nabhsetu. <a href="/dashboard/">Dashboard</a> | <a href="/docs">API docs</a></p>')

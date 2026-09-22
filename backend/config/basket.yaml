@@ -1,5 +1,5 @@
 version: "basket-1.0.0"
-name: "APIx domestic representative basket"
+name: "Nabhsetu domestic representative basket"
 notes: "Seed basket for SIH26056. Replace with PSD-signed weights when supplied."
 routes:
   - DEL-BOM

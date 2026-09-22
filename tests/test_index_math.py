@@ -429,3 +429,76 @@ def test_a_route_entering_after_the_base_period_is_reported_not_hidden():
     assert res.diagnostics["n_cells_suppressed"] == len(late)
     # And the headline is still exactly the surviving route's own index.
     assert res.headline["value"].iloc[-1] == pytest.approx(100.0)
+
+
+# ------------------------------------------------ base period / travel basis
+
+def _ramping_panel() -> pd.DataFrame:
+    """A panel collected from a fixed start, indexed on the TRAVEL basis.
+
+    This is the shape real collection has: on the first collection day you can
+    only see departures 1..45 days out, so an EARLY departure date can only
+    ever have been observed at a SHORT advance-purchase window. A departure 45
+    days after collection began is the first that can be seen at every window.
+    """
+    rows = []
+    start = pd.Timestamp("2026-05-01")
+    for d in range(60):
+        collected = start + pd.Timedelta(days=d)
+        for apw in (1, 7, 15, 30, 45):
+            departure = collected + pd.Timedelta(days=apw)
+            for f in range(6):
+                rows.append(dict(
+                    collected_date=collected.date().isoformat(),
+                    departure_date=departure.date().isoformat(),
+                    route="DEL-BOM", carrier="6E", apw_days=apw,
+                    flight_number=f"6E-{f}", fare_family="SAVER", cabin="economy",
+                    stops=0, price=5000.0 + 100.0 * apw, disposition="ACCEPTED"))
+    return pd.DataFrame(rows)
+
+
+def _cfg(**kw) -> MethodConfig:
+    base = dict(apw_windows=(1, 7, 15, 30, 45), omega={1: 0.2, 7: 0.2, 15: 0.2, 30: 0.2, 45: 0.2},
+                bootstrap_draws=0, apply_dow_smoothing=False)
+    base.update(kw)
+    return MethodConfig(**base)
+
+
+def test_travel_basis_base_period_covers_every_lead_time_window():
+    """Regression: the travel-basis headline collapsed into the T+1 series.
+
+    Taking the first period as the base put a departure date in the base that
+    could only have been observed at T+1. Every T+7..T+45 cell then failed to
+    find a match in the base and was suppressed, so the published "headline"
+    was the T+1 index wearing the headline's label, with omega inert.
+    """
+    weights = WeightSet({"DEL-BOM": 1.0}, {"DEL-BOM": {"6E": 1.0}})
+    res = compute(_ramping_panel(), weights, _cfg(basis="travel"))
+
+    windows = set(res.by_apw["apw_days"].astype(int))
+    assert windows == {1, 7, 15, 30, 45}, (
+        f"travel basis must index every lead-time window, got {sorted(windows)}")
+
+    covered = res.headline["omega_covered"].max()
+    assert covered == pytest.approx(1.0), (
+        "at least one headline period must rest on the whole omega vector")
+
+
+def test_book_basis_base_period_is_still_the_first_period():
+    """The base rule must not disturb the book basis, where day one is full."""
+    weights = WeightSet({"DEL-BOM": 1.0}, {"DEL-BOM": {"6E": 1.0}})
+    panel = _ramping_panel()
+    res = compute(panel, weights, _cfg(basis="book"))
+    assert res.diagnostics["base_period"] == panel["collected_date"].min()
+
+
+def test_pinned_base_period_is_honoured_and_validated():
+    """A published series pins its base; a bad pin fails loudly, not silently."""
+    weights = WeightSet({"DEL-BOM": 1.0}, {"DEL-BOM": {"6E": 1.0}})
+    panel = _ramping_panel()
+    pinned = "2026-05-20"
+    res = compute(panel, weights, _cfg(basis="book", base_period=pinned))
+    assert res.diagnostics["base_period"] == pinned
+
+    with pytest.raises(ValueError, match="pinned base_period"):
+        compute(panel, weights, _cfg(basis="book", base_period="1999-01-01"))

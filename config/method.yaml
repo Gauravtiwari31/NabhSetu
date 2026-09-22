@@ -1,4 +1,4 @@
-# APIx method configuration.
+# Nabhsetu method configuration (the APIx index family).
 # Every value here is stamped onto published index numbers as `method_version`.
 method_version: "1.0.0"
 
@@ -18,6 +18,20 @@ jump_sigma: 3.0
 
 # Day-of-week de-seasonalising: 7-day centred geometric moving average.
 dow_window: 7
+
+# Reference period. Null lets the engine pick the earliest BEST-COVERED period,
+# which matters on the travel basis: the earliest departure date in a panel can
+# only have been observed at the shortest advance-purchase window, so taking it
+# as the base silently collapses the headline to a T+1 index.
+# PIN THIS (e.g. "2026-08-01") once a series is published for real -- a base
+# that moves as new data arrives rewrites history.
+base_period: null
+
+# A headline period must rest on at least this share of omega to be published.
+# Below it the number is not what its label claims: it is one or two windows
+# standing in for the whole booking curve. Per-window sub-series are exempt --
+# being a single window is their definition.
+min_omega_covered: 0.60
 
 # Uncertainty: flight-block bootstrap.
 bootstrap_draws: 500

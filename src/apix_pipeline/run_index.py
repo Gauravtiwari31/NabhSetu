@@ -16,9 +16,10 @@ import pandas as pd
 from apix_index import MethodConfig, WeightSet, compute, to_frequency
 from apix_pipeline.quality import blocking_failures, run_contract, summarise
 from apix_store import db
+from apix_store.errors import OperatorError
 
 
-class PublicationBlocked(RuntimeError):
+class PublicationBlocked(OperatorError):
     """Raised when a BLOCK-severity quality check fails. Nothing is published."""
 
 
@@ -98,6 +99,7 @@ def run(conn: sqlite3.Connection, cfg: Dict, weights: WeightSet,
     now = datetime.now(timezone.utc).isoformat()
     rows: List[dict] = []
     results: Dict[str, object] = {}
+    suppressed_headline: Dict[str, int] = {}
     headline_variant = method.get("headline_variant", "T")
     default_preset = method.get("default_omega_preset", "uniform")
 
@@ -126,16 +128,31 @@ def run(conn: sqlite3.Connection, cfg: Dict, weights: WeightSet,
                     bootstrap_draws=draws if is_headline_cfg else 0,
                     bootstrap_seed=int(method["bootstrap_seed"]),
                     ci_level=float(method["ci_level"]),
-                    omega=omega, omega_preset=preset, variant=variant, basis=basis)
+                    omega=omega, omega_preset=preset, variant=variant, basis=basis,
+                    base_period=method.get("base_period"),
+                    min_omega_covered=float(method.get("min_omega_covered", 0.60)))
 
                 res = compute(frame, weights, mc)
                 key = f"APIx-{variant}|{basis}|{preset}"
                 results[key] = res
 
                 code = f"APIx-{variant}"
+                # Headline periods that rest on too little of the lead-time
+                # weight are withheld, the same way a thin cell is suppressed.
+                # They are still computed, still in `res`, and the count of
+                # what was withheld is returned -- they are just not published
+                # under a label that claims to price the whole booking curve.
+                headline = res.headline
+                withheld = 0
+                if "omega_covered" in headline.columns:
+                    keep = headline["omega_covered"].fillna(0.0) >= mc.min_omega_covered
+                    withheld = int((~keep).sum())
+                    headline = headline[keep]
+                    suppressed_headline[f"{code}|{basis}|{preset}"] = withheld
+
                 for freq in ("daily", "weekly", "monthly"):
-                    series = (res.headline if freq == "daily"
-                              else to_frequency(res.headline, freq))
+                    series = (headline if freq == "daily"
+                              else to_frequency(headline, freq))
                     for _, r in series.iterrows():
                         rows.append(_row(code, r, freq, basis, preset, res, run_id, now,
                                          is_synthetic))
@@ -158,6 +175,7 @@ def run(conn: sqlite3.Connection, cfg: Dict, weights: WeightSet,
 
     return {
         "run_id": run_id, "n_index_values": written,
+        "headline_periods_withheld_low_omega": suppressed_headline,
         "quality": summarise(checks),
         "n_quotes_publishable": int(len(publishable)),
         "is_synthetic": bool(is_synthetic),
@@ -209,7 +227,8 @@ def _row(code: str, r: pd.Series, freq: str, basis: str, preset: str, res,
         "omega_preset": preset, "value": float(r["value"]),
         "se": _opt(r.get("se")), "ci_low": _opt(r.get("ci_low")), "ci_high": _opt(r.get("ci_high")),
         "n_quotes": _opti(r.get("n_quotes")), "n_cells": _opti(r.get("n_cells")),
-        "coverage_pct": _opt(r.get("coverage_pct")), "is_synthetic": is_synthetic,
+        "coverage_pct": _opt(r.get("coverage_pct")),
+        "omega_covered": _opt(r.get("omega_covered")), "is_synthetic": is_synthetic,
         "method_version": res.method_version, "weights_version": res.weights_version,
         "run_id": run_id, "computed_at_utc": now,
     }

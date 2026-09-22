@@ -113,9 +113,40 @@ def _prepare(quotes: Sequence[Quote | Mapping[str, Any]], config: MethodConfig) 
     return collapsed
 
 
+def _choose_base_period(quotes: list[Quote], periods: list[str], config: MethodConfig) -> str:
+    """Pick the reference period for the matched-model comparison.
+
+    Taking `periods[0]` breaks the TRAVEL basis, where a period is a DEPARTURE
+    date: the earliest departure in a panel can only have been observed at the
+    shortest advance-purchase window, so the base carries T+1 products alone,
+    every longer window fails to match against it and is suppressed, and the
+    headline quietly degenerates into the T+1 series with the omega lead-time
+    weights inert. Choose the earliest period carrying the most distinct
+    cells instead. On the book basis that is day one, exactly as before.
+
+    A pinned `config.base_period` wins: a published base must not move.
+    """
+    if config.base_period:
+        if config.base_period not in set(periods):
+            raise ValueError(
+                f"pinned base_period {config.base_period!r} has no publishable "
+                f"quotes; available periods run {periods[0]} .. {periods[-1]}")
+        return config.base_period
+
+    # Rank by distinct advance-purchase windows -- precisely what the defect
+    # destroys and what omega needs. Deliberately not "most cells": one
+    # late-entering route would then drag the base to the end of the panel and
+    # change the matched set for every earlier period. Ties go to the oldest.
+    windows_by_period: dict[str, set[int]] = defaultdict(set)
+    for quote in quotes:
+        windows_by_period[quote.period_for(config.basis)].add(int(quote.apw_days))
+    best = max(len(windows) for windows in windows_by_period.values())
+    return min(period for period, windows in windows_by_period.items() if len(windows) == best)
+
+
 def _cell_indices(quotes: list[Quote], config: MethodConfig) -> tuple[list[CellResult], dict]:
     periods = sorted({quote.period_for(config.basis) for quote in quotes})
-    base = periods[0]
+    base = _choose_base_period(quotes, periods, config)
     by_period: dict[str, list[Quote]] = defaultdict(list)
     for quote in quotes:
         by_period[quote.period_for(config.basis)].append(quote)

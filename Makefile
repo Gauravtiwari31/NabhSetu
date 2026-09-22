@@ -1,4 +1,4 @@
-# APIx. `make demo` takes a cold machine to a served dashboard.
+# Nabhsetu. `make demo` takes a cold machine to a served APIx dashboard.
 PY ?= python
 
 .PHONY: help install init load-cpi backfill index demo serve test lint coverage report verify reproduce elasticity backtest nowcast status clean
@@ -20,17 +20,22 @@ install:
 init:
 	$(PY) cli.py init
 
+# Optional: the CPI comparator is only needed for `backtest` and `nowcast`.
+# Datasets/ is gitignored, so a fresh clone will not have it and `demo` must
+# not depend on it.
 load-cpi:
-	$(PY) cli.py load-cpi --dir $(or $(CPI_DIR),../Datasets)
+	$(PY) cli.py load-cpi --dir $(or $(CPI_DIR),Datasets)
 
 # The window ends 2026-07-31 so the monthly series overlaps the CPI comparator.
+# --simulate is REQUIRED here: the synthetic rung ships disabled so it can
+# never run in a deployment by accident. Every row it writes is is_synthetic=1.
 backfill:
-	$(PY) cli.py backfill --days $(or $(DAYS),240) --end $(or $(END),2026-07-31)
+	$(PY) cli.py backfill --simulate --days $(or $(DAYS),240) --end $(or $(END),2026-07-31)
 
 index:
 	$(PY) cli.py index
 
-demo: init load-cpi backfill index status
+demo: init backfill index status
 	@echo ""
 	@echo "Ready. Run 'make serve' and open http://127.0.0.1:8000/dashboard/"
 	@echo "NOTE: the data is SYNTHETIC. It demonstrates the method, not Indian airfares."
@@ -49,7 +54,7 @@ coverage:
 	$(PY) -m coverage report --precision=1
 
 # Runs the whole review -- tests, coverage, lint, verification, API sweep --
-# and renders reports/APIx_Test_and_Review_Report.pdf from what it measured.
+# and renders the test & review report from what it measured.
 report:
 	$(PY) tools/collect_evidence.py
 	$(PY) tools/build_report.py

@@ -57,7 +57,7 @@ sources:
 
 # The Politeness Governor. Every fetch passes through this middleware.
 politeness:
-  user_agent: "APIx-Research/1.0 (+https://example.gov.in/apix/contact)"
+  user_agent: "Nabhsetu-Research/1.0 (+https://example.gov.in/nabhsetu/contact)"
   respect_robots: true
   default_crawl_delay_s: 10.0     # used when robots.txt declares none
   jitter_s: 2.0

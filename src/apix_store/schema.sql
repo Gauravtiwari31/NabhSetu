@@ -177,6 +177,7 @@ CREATE TABLE IF NOT EXISTS fact_index_value (
     n_quotes        INTEGER,
     n_cells         INTEGER,
     coverage_pct    REAL,
+    omega_covered   REAL,                     -- share of omega represented
     is_synthetic    INTEGER NOT NULL DEFAULT 0,
     method_version  TEXT NOT NULL,
     weights_version TEXT NOT NULL,

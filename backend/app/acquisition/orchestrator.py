@@ -37,6 +37,59 @@ class QueryRunRecord:
     final_url: str | None = None
 
 
+def _flatten_observation(item: Any) -> dict[str, Any]:
+    """One collected fare as a flat, export-ready row.
+
+    This used to project six fields -- carrier, flight number, total fare,
+    currency, travel date, collector -- and drop the rest. A row with no
+    origin, no destination and no booking date cannot be attributed to a route
+    or an advance-purchase window, which makes it useless for index
+    construction: the CSV that fell out of it could only ever be a fare
+    listing, not index input. The observation already carries every field the
+    PS asks for, including the base-fare/tax/UDF/convenience split, so emit
+    all of it and let the consumer choose columns.
+    """
+    def money(value: Any) -> str | None:
+        return None if value is None else format(value, "f")
+
+    return {
+        "observation_id": str(item.observation_id),
+        "source": item.source,
+        "source_type": item.source_type.value,
+        "collector": item.collector.value,
+        "collected_at": item.collected_at.isoformat(),
+        "origin": item.origin_airport,
+        "destination": item.destination_airport,
+        "route": f"{item.origin_airport}-{item.destination_airport}",
+        "travel_date": item.travel_date.isoformat(),
+        "booking_date": item.booking_date.isoformat(),
+        "lead_time_days": item.lead_time_days,
+        "carrier": item.carrier,
+        "operating_carrier": item.operating_carrier,
+        "flight_number": item.flight_number,
+        "departure_time": item.departure_time.isoformat() if item.departure_time else None,
+        "arrival_time": item.arrival_time.isoformat() if item.arrival_time else None,
+        "cabin_class": item.cabin_class,
+        "fare_brand": item.fare_brand,
+        "fare_class": item.fare_class,
+        "base_fare": money(item.base_fare),
+        "taxes": money(item.taxes),
+        "airport_fee": money(item.airport_fee),
+        "udf": money(item.udf),
+        "convenience_fee": money(item.convenience_fee),
+        "other_fee": money(item.other_fee),
+        "total_fare": money(item.total_fare),
+        "currency": item.currency,
+        "refundable": item.refundable,
+        "baggage_allowance": item.baggage_allowance,
+        "availability": item.seat_or_fare_availability.value,
+        "extraction_confidence": format(item.extraction_confidence, "f"),
+        "raw_record_hash": item.raw_record_hash,
+        "parser_version": item.parser_version,
+        "is_simulated": item.is_simulated,
+    }
+
+
 class LiveRunOrchestrator:
     """Multi-source, multi-date runner. Persists only real collection outcomes."""
 
@@ -123,17 +176,7 @@ class LiveRunOrchestrator:
     ) -> QueryRunRecord:
         request_id = f"live-{uuid4()}"
         job_id, result = await self.container.collection.submit(query, request_id=request_id)
-        fares = [
-            {
-                "carrier": item.carrier,
-                "flight_number": item.flight_number,
-                "total_fare": format(item.total_fare, "f"),
-                "currency": item.currency,
-                "travel_date": item.travel_date.isoformat(),
-                "collector": item.collector.value,
-            }
-            for item in result.observations
-        ]
+        fares = [_flatten_observation(item) for item in result.observations]
         return QueryRunRecord(
             source=source.name,
             origin=query.origin,

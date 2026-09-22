@@ -79,6 +79,10 @@ class MethodConfig:
     basis: Basis = "book"
     apply_availability_adjustment: bool = True
     apply_dow_smoothing: bool = True
+    # Reference period for the matched-model comparison. Unset, the engine
+    # picks the earliest best-covered period; pin it once a series is
+    # published so new data cannot rewrite the history.
+    base_period: str | None = None
 
     def omega_vector(self) -> dict[int, Decimal]:
         if self.omega:

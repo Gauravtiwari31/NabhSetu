@@ -69,8 +69,13 @@ def create_app() -> FastAPI:
     )
     application.add_middleware(RequestLoggingMiddleware)
 
-    @application.get("/health", tags=["system"])
-    def health_check():
+    # Liveness ping for uptime monitors and the Render health check. It is
+    # deliberately dependency-free and deliberately NOT /health: the real
+    # /health lives on api_router, touches the database, and reports
+    # data_mode and is_simulated. Registering a bare /health here would be
+    # matched first and would hide that.
+    @application.get("/healthz", tags=["system"])
+    def liveness():
         return {"status": "ok"}
 
     application.include_router(api_router)

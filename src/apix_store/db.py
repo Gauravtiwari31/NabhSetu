@@ -27,13 +27,27 @@ EARTH_R_KM = 6371.0088
 
 # ------------------------------------------------------------------- config
 
-def load_config() -> Dict[str, object]:
-    """Load every YAML config file once, as one dict."""
+def load_config(enable_simulator: bool = False) -> Dict[str, object]:
+    """Load every YAML config file once, as one dict.
+
+    `synthetic_replay` ships disabled so it can never run by accident in a
+    deployment: a simulated fare that reached a published chart unlabelled
+    would be the single worst failure this project could have. Demos, CI and
+    the offline back-test replay need it, so they opt in EXPLICITLY -- either
+    by passing `enable_simulator=True` or by setting APIX_ENABLE_SIMULATOR=1.
+    Opting in changes nothing else: every row the simulator writes is still
+    stamped is_synthetic=1 all the way to the API response.
+    """
     cfg: Dict[str, object] = {}
     for name in ("method", "basket", "carriers", "charges", "sources", "airports"):
         path = CONFIG_DIR / f"{name}.yaml"
         with open(path, "r", encoding="utf-8") as fh:
             cfg[name] = yaml.safe_load(fh)
+
+    if enable_simulator or os.environ.get("APIX_ENABLE_SIMULATOR") == "1":
+        for spec in cfg["sources"]["sources"]:  # type: ignore[index]
+            if spec.get("type") == "simulator":
+                spec["enabled"] = True
     return cfg
 
 
@@ -61,6 +75,12 @@ def init_schema(conn: sqlite3.Connection) -> None:
 # explicitly or an existing store silently keeps the old shape.
 _ADDED_COLUMNS = {
     "fact_fare_quote": [("total_fare_capped", "REAL")],
+    # Share of the lead-time weight vector actually represented in the period.
+    # On the travel basis early departure dates can only have been observed at
+    # short advance-purchase windows, so a headline there may rest on a
+    # fraction of omega. Published, that is a caveat; unpublished, it is a
+    # trap, because the number looks like every other number in the series.
+    "fact_index_value": [("omega_covered", "REAL")],
 }
 
 
@@ -277,7 +297,8 @@ def insert_quotes(conn: sqlite3.Connection, quotes: Iterable[dict]) -> int:
 def write_index_values(conn: sqlite3.Connection, rows: List[dict]) -> int:
     cols = ["index_id", "index_code", "period", "frequency", "basis", "omega_preset",
             "value", "se", "ci_low", "ci_high", "n_quotes", "n_cells", "coverage_pct",
-            "is_synthetic", "method_version", "weights_version", "run_id", "computed_at_utc"]
+            "omega_covered", "is_synthetic", "method_version", "weights_version",
+            "run_id", "computed_at_utc"]
     sql = (f"INSERT OR REPLACE INTO fact_index_value ({','.join(cols)}) "
            f"VALUES ({','.join(':' + c for c in cols)})")
     conn.executemany(sql, [{c: r.get(c) for c in cols} for r in rows])
