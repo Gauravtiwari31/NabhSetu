@@ -103,6 +103,13 @@ def run(conn: sqlite3.Connection, cfg: Dict, weights: WeightSet,
     headline_variant = method.get("headline_variant", "T")
     default_preset = method.get("default_omega_preset", "uniform")
 
+    # Chain-linkage onto an earlier published base (see config/method.yaml).
+    # Disabled leaves the index on its own base period = 100.
+    linkage = method.get("linkage") or {}
+    link_on = bool(linkage.get("enabled"))
+    link_factor = float(linkage["link_factor"]) if link_on else None
+    link_label = linkage.get("label") if link_on else None
+
     for variant in variants:
         frame = publishable.rename(columns={f"price_{variant}": "price"})
         frame = frame[frame["price"].notna() & (frame["price"] > 0)]
@@ -130,7 +137,8 @@ def run(conn: sqlite3.Connection, cfg: Dict, weights: WeightSet,
                     ci_level=float(method["ci_level"]),
                     omega=omega, omega_preset=preset, variant=variant, basis=basis,
                     base_period=method.get("base_period"),
-                    min_omega_covered=float(method.get("min_omega_covered", 0.60)))
+                    min_omega_covered=float(method.get("min_omega_covered", 0.60)),
+                    link_factor=link_factor, link_label=link_label)
 
                 res = compute(frame, weights, mc)
                 key = f"APIx-{variant}|{basis}|{preset}"

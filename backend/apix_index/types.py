@@ -83,6 +83,15 @@ class MethodConfig:
     # picks the earliest best-covered period; pin it once a series is
     # published so new data cannot rewrite the history.
     base_period: str | None = None
+    # Chain-link onto an external index already published on an earlier base,
+    # so this series can be presented on that base (e.g. 2024=100). The index
+    # cannot be BASED on 2024: the matched-model comparison needs base-period
+    # quotes to match against, and no 2024 fare quotes exist or can be
+    # back-collected. The link is one multiplicative constant on every
+    # published level -- it moves the LEVEL and never a relative. It is a
+    # SPLICE, not a measurement. See config/method.yaml `linkage`.
+    link_factor: Decimal | None = None
+    link_label: str | None = None
 
     def omega_vector(self) -> dict[int, Decimal]:
         if self.omega:
@@ -241,6 +250,9 @@ class HeadlinePoint:
     coverage_pct: Decimal
     omega_covered: Decimal
     value_unsmoothed: Decimal | None = None
+    # The index on its own base, before any chain-linkage. Retained so a
+    # linked level is always reversible back to the measurement.
+    value_native: Decimal | None = None
 
 
 @dataclass

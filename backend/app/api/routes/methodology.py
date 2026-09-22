@@ -19,6 +19,39 @@ def _meta(settings: Settings) -> SimulatedEnvelope:
     )
 
 
+def _notes(config) -> list[str]:
+    """Method notes, including what the published level is measured against.
+
+    A reader who sees 105.6 will assume it was measured against 2024 unless
+    told otherwise, so the base is stated here rather than left to be inferred
+    from a chart axis. The distinction between a measured base and a spliced
+    one is the whole disclosure: the index is computed on its own base period
+    and then rescaled onto 2024, and only the first half of that is a
+    measurement.
+    """
+    notes = [
+        "APIx-T is a traveller-paid Jevons elementary index with Young aggregation.",
+        "Late entrants are not chain-linked; unmatched cells are suppressed.",
+        "Availability adjustment blends matched and lowest-available-fare indices.",
+        "Official DGCA/CPI figures are imported from checksummed public files only.",
+    ]
+    if config.link_factor is None:
+        notes.append(
+            "BASE: published on the index's own base period = 100. No linkage applied."
+        )
+        return notes
+    notes.append(
+        f"BASE: published on {config.link_label}. The index is MEASURED on its own base "
+        f"period, then multiplied by {format(config.link_factor, 'f')}/100 to sit on that "
+        "base. THE LINKAGE IS A SPLICE, NOT A MEASUREMENT: it assumes airfare inflation to "
+        "the link period equalled CPI Transport inflation. Transport carries road fuel, rail "
+        "fares and vehicle prices, and the MoSPI extracts contain no air-fare item index at "
+        "all. No 2024 fare quotes exist, so a measured 2024 base is not available. The "
+        "unlinked measurement is retained for every period as value_native."
+    )
+    return notes
+
+
 @router.get("/methodology", response_model=MethodologyResponse)
 async def methodology(settings: Settings = Depends(get_settings)) -> MethodologyResponse:
     config = load_method_config(settings)
@@ -31,12 +64,12 @@ async def methodology(settings: Settings = Depends(get_settings)) -> Methodology
         omega={str(key): format(value, "f") for key, value in omega.items()},
         apw_windows=list(config.apw_windows),
         n_min=config.n_min,
-        notes=[
-            "APIx-T is a traveller-paid Jevons elementary index with Young aggregation.",
-            "Late entrants are not chain-linked; unmatched cells are suppressed.",
-            "Availability adjustment blends matched and lowest-available-fare indices.",
-            "Official DGCA/CPI figures are imported from checksummed public files only.",
-        ],
+        notes=_notes(config),
+        published_base=(
+            f"{config.link_label.split(',')[0]} (linked)" if config.link_factor is not None
+            else "base period = 100"
+        ),
+        is_linked=config.link_factor is not None,
         meta=_meta(settings),
     )
 

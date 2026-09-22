@@ -62,6 +62,18 @@ class MethodConfig:
     # fine but is not the thing its label claims: it is one or two windows
     # standing in for the whole booking curve.
     min_omega_covered: float = 0.60
+    # Chain-link onto an external index already published on an earlier base,
+    # so this series can be presented on that base (e.g. 2024=100). APIx cannot
+    # be BASED on 2024: the matched-model comparison needs base-period quotes to
+    # match against, and no 2024 fare quotes exist or can be back-collected.
+    #
+    # The link is one multiplicative constant applied to every published level.
+    # It moves the LEVEL and never a relative -- period on period and cell on
+    # cell are identical before and after. It is a SPLICE, not a measurement:
+    # it asserts the external series' inflation across the gap. Publish the
+    # linked level as linked, and keep `value_native` beside it.
+    link_factor: Optional[float] = None
+    link_label: Optional[str] = None
 
     def omega_vector(self) -> Dict[int, float]:
         """Lead-time weights, defaulting to uniform over the configured windows."""

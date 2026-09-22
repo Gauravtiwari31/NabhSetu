@@ -76,6 +76,11 @@ class MethodologyResponse(BaseModel):
     apw_windows: list[int]
     n_min: int
     notes: list[str]
+    # What the published level is measured against, e.g. "2024=100 (linked)" or
+    # "base period = 100". Stated as a field so a caller does not have to infer
+    # the base from a chart axis and guess wrong.
+    published_base: str
+    is_linked: bool
     meta: SimulatedEnvelope
 
 

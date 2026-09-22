@@ -17,6 +17,8 @@ import { ArrowRight } from "lucide-react";
 export function OverviewPage() {
   const series = useQuery({ queryKey: ["index", "daily"], queryFn: () => api.index("daily") });
   const coverage = useQuery({ queryKey: ["coverage"], queryFn: api.coverage });
+  const methodology = useQuery({ queryKey: ["methodology"], queryFn: api.methodology });
+  const publishedBase = (methodology.data as { published_base?: string } | undefined)?.published_base;
   const items = (series.data as { items?: Array<Record<string, string>> } | undefined)?.items ?? [];
   const chart = items.map((item) => ({
     period: item.period,
@@ -50,6 +52,7 @@ export function OverviewPage() {
         <div className="card">
           <div className="muted">Latest Level</div>
           <div className="metric">{formatIndex(latest?.value)}</div>
+          <div className="base-note">{publishedBase ?? "—"}</div>
         </div>
         <div className="card">
           <div className="muted">Basket Coverage</div>

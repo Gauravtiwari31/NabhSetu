@@ -412,3 +412,69 @@ def test_base_period_is_one_hundred() -> None:
         MethodConfig(apw_windows=(7,), omega={7: Decimal("1")}, bootstrap_draws=0, apply_dow_smoothing=False),
     )
     assert float(result.headline[0].value) == pytest.approx(100.0)
+
+
+# ---------------------------------------------------------------- linkage
+
+
+def _linkage_rows() -> list[dict]:
+    """Three booking days on one route, with a real price move between them."""
+    rows = []
+    for day, mult in [("2026-05-01", 1.00), ("2026-05-02", 1.10), ("2026-05-03", 0.95)]:
+        for flight in range(6):
+            rows.append(
+                dict(
+                    collected_date=day,
+                    departure_date="2026-05-08",
+                    route="DEL-BOM",
+                    carrier="6E",
+                    apw_days=7,
+                    flight_number=f"6E-{flight}",
+                    fare_family="SAVER",
+                    cabin="economy",
+                    stops=0,
+                    price=5000.0 * mult,
+                    disposition="ACCEPTED",
+                )
+            )
+    return rows
+
+
+def test_chain_link_rescales_levels_but_preserves_every_relative() -> None:
+    """A splice is a change of base, not a change of measurement.
+
+    Chain-linking multiplies every published level by one constant. That moves
+    the base -- the whole point -- but it must leave the index's actual
+    content, the movement between periods, untouched. If a link factor could
+    alter a relative it would not be a rebasing, it would be a distortion.
+    """
+    rows = _linkage_rows()
+    weights = WeightSet.from_mapping({"DEL-BOM": 1.0}, {"DEL-BOM": {"6E": 1.0}})
+    cfg = dict(apw_windows=(7,), omega={7: Decimal("1")}, bootstrap_draws=0, apply_dow_smoothing=False)
+    factor = Decimal("105.63")
+
+    native = compute(rows, weights, MethodConfig(**cfg)).headline
+    linked = compute(rows, weights, MethodConfig(link_factor=factor, **cfg)).headline
+
+    scale = factor / Decimal("100")
+    for nat, lnk in zip(native, linked):
+        assert float(lnk.value) == pytest.approx(float(nat.value * scale), rel=1e-12)
+        # The measurement survives the splice and stays recoverable.
+        assert float(lnk.value_native) == pytest.approx(float(nat.value), rel=1e-12)
+    # The base period now reads at the linked base, not at 100.
+    assert float(linked[0].value) == pytest.approx(float(factor), rel=1e-9)
+    # Relatives are identical: period on period is untouched.
+    for i in range(1, len(linked)):
+        assert float(linked[i].value / linked[i - 1].value) == pytest.approx(
+            float(native[i].value / native[i - 1].value), rel=1e-12
+        )
+
+
+def test_chain_link_rejects_a_nonsense_factor() -> None:
+    """A zero or negative factor would silently invert or annihilate the series."""
+    rows = _linkage_rows()
+    weights = WeightSet.from_mapping({"DEL-BOM": 1.0}, {"DEL-BOM": {"6E": 1.0}})
+    cfg = dict(apw_windows=(7,), omega={7: Decimal("1")}, bootstrap_draws=0, apply_dow_smoothing=False)
+    for bad in (Decimal("0"), Decimal("-105.63"), Decimal("NaN")):
+        with pytest.raises(ValueError, match="link_factor"):
+            compute(rows, weights, MethodConfig(link_factor=bad, **cfg))

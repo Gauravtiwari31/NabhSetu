@@ -403,9 +403,34 @@ def compute(quotes: pd.DataFrame, weights: WeightSet, config: MethodConfig) -> I
     headline["n_quotes"] = headline["period"].map(
         cells.groupby("period")["n_quotes"].sum()).fillna(0).astype(int)
 
+    # --- chain-linking ----------------------------------------------------
+    # One multiplicative constant applied to every published level, so the
+    # series reads on the linked base (2024=100) rather than on its own base
+    # period. Every relative is untouched by construction: the base period
+    # still sits exactly `link_factor` above the linked base, and each period
+    # keeps its ratio to every other. `value_native` retains the measurement,
+    # so the splice is reversible and both can be shown side by side.
+    link = config.link_factor
+    headline["value_native"] = headline["value"]
+    if link is not None:
+        if not np.isfinite(float(link)) or float(link) <= 0:
+            raise ValueError(
+                f"link_factor must be a positive finite number, got {link!r}")
+        scale = float(link) / 100.0
+        for col in ("value", "se", "ci_low", "ci_high", "value_unsmoothed"):
+            if col in headline.columns:
+                headline[col] = headline[col] * scale
+        by_apw["value"] = by_apw["value"] * scale
+        by_route["value"] = by_route["value"] * scale
+        for col in ("adjusted", "adjusted_raw"):
+            if col in cells.columns:
+                cells[col] = cells[col] * scale
+
     n_suppressed = int(cells["suppressed"].sum())
     diagnostics = {
         "base_period": base_period,
+        "link_factor": float(link) if link is not None else None,
+        "link_label": config.link_label,
         "n_periods": int(headline.shape[0]),
         "n_cells_total": int(cells.shape[0]),
         "n_cells_suppressed": n_suppressed,

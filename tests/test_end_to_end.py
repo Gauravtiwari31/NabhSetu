@@ -83,14 +83,18 @@ def test_index_published_with_versions_stamped(built):
     assert row["is_synthetic"] == 1, "simulator output must be stamped synthetic"
 
 
-def test_base_period_is_exactly_100(built):
-    conn, *_ = built
+def test_base_period_sits_at_the_published_base_level(built):
+    conn, cfg, *_ = built
     first = conn.execute(
         "SELECT value FROM fact_index_value WHERE index_code='APIx-T' AND frequency='daily' "
         "AND basis='book' ORDER BY period LIMIT 1").fetchone()
-    # The base period is 100 before smoothing; the 7-day centred filter moves the
-    # endpoint, so assert it is in a tight neighbourhood rather than exactly 100.
-    assert 97.0 < first["value"] < 103.0
+    # The base period is 100 on the native scale, and `link_factor` once the
+    # series is chain-linked onto an earlier base (config/method.yaml `linkage`).
+    # The 7-day centred filter moves the endpoint, so assert a tight
+    # neighbourhood of that level rather than the level exactly.
+    linkage = cfg["method"].get("linkage") or {}
+    expected = float(linkage["link_factor"]) if linkage.get("enabled") else 100.0
+    assert expected * 0.97 < first["value"] < expected * 1.03
 
 
 def test_recomputation_is_bit_identical(built):

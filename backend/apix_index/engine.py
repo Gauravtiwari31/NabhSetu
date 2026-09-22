@@ -376,8 +376,41 @@ def compute(quotes: Sequence[Quote | Mapping[str, Any]], weights: WeightSet, con
             )
         )
 
+    # --- chain-linking ----------------------------------------------------
+    # See config/method.yaml `linkage`. One multiplicative constant applied to
+    # every published level, so the series reads on the linked base (2024=100)
+    # instead of on its own base period. Every relative survives untouched by
+    # construction -- period on period and cell on cell are identical before
+    # and after -- and `value_native` retains the measurement, so the splice is
+    # reversible and both can be reported side by side.
+    link = config.link_factor
+    for point in headline:
+        point.value_native = point.value
+    if link is not None:
+        if not link.is_finite() or link <= 0:
+            raise ValueError(
+                f"link_factor must be a positive finite number, got {link!r}")
+        scale = link / Decimal("100")
+        for point in headline:
+            point.value = point.value * scale
+            for attr in ("se", "ci_low", "ci_high", "value_unsmoothed"):
+                current = getattr(point, attr)
+                if current is not None:
+                    setattr(point, attr, current * scale)
+        for apw_item in by_apw:
+            apw_item.value = apw_item.value * scale
+        for route_item in by_route:
+            route_item.value = route_item.value * scale
+        for cell in cells:
+            for attr in ("adjusted", "adjusted_raw"):
+                current = getattr(cell, attr)
+                if current is not None:
+                    setattr(cell, attr, current * scale)
+
     diagnostics = {
         "base_period": base_period,
+        "link_factor": format(link, "f") if link is not None else None,
+        "link_label": config.link_label,
         "n_periods": len(headline),
         **cell_suppression(cells),
         "mean_availability": round(

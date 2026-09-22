@@ -24,8 +24,47 @@ dow_window: 7
 # only have been observed at the shortest advance-purchase window, so taking it
 # as the base silently collapses the headline to a T+1 index.
 # PIN THIS (e.g. "2026-08-01") once a series is published for real -- a base
-# that moves as new data arrives rewrites history.
+# that moves as new data arrives rewrites history. NOTE: the pipeline runs BOTH
+# bases, and a book period is a collection date while a travel period is a
+# departure date, so one pinned value cannot serve both -- pin per basis, or
+# the run that does not contain the date raises.
+#
+# This CANNOT be set to a 2024 date. See `linkage` below.
 base_period: null
+
+# ---------------------------------------------------------------- linkage
+# Presenting the index on a 2024=100 footing.
+#
+# APIx cannot be BASED on 2024. The matched-model (Jevons) comparison prices
+# product kappa at the base against kappa at period t; with no 2024 quotes
+# there are no matches and there is no index. No 2024 fare quotes exist in
+# this project and none can be back-collected -- a fare is a quote at a moment,
+# not a fact retrievable later. Pinning base_period into 2024 raises.
+#
+# So the native series is CHAIN-LINKED onto MoSPI's CPI Transport division,
+# which is itself published on base 2024=100:
+#
+#     APIx_2024(t) = APIx_native(t) * link_factor / 100
+#
+# THIS IS A SPLICE, NOT A MEASUREMENT. It asserts that airfare inflation from
+# 2024 to the link period equalled Transport CPI inflation over the same span.
+# That assumption is weak and must be reported, not buried:
+#   - Transport is a DILUTED proxy. It carries road fuel, rail fares and
+#     vehicle prices, all of which move for unrelated reasons. There is no
+#     'passenger transport by air' item index in the MoSPI extracts at all
+#     (see apix_reference/cpi.py).
+#   - Airfares are far more volatile than the Transport aggregate: Transport
+#     sat at 100.5-100.9 through early 2026, then stepped to 105.63 by July.
+#   - CPI Transport stops at 2026-07 while the fare panel starts 2026-09, so
+#     a two-month gap is bridged by assumption, not by data.
+# The engine keeps the unlinked measurement as `value_native` on every period.
+linkage:
+  enabled: true
+  base_year: 2024
+  link_factor: 105.63
+  link_period: "2026-07"
+  source_file: "Datasets/cpi_96.csv"
+  label: "2024=100, chain-linked via CPI Transport (All India, Combined), 2026-07"
 
 # A headline period must rest on at least this share of omega to be published.
 # Below it the number is not what its label claims: it is one or two windows

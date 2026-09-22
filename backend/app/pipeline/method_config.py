@@ -34,6 +34,12 @@ def load_method_config(settings: Settings | None = None, *, omega_preset: str | 
     omega = None
     if omega_raw:
         omega = {int(key): Decimal(str(value)) for key, value in omega_raw.items()}
+    # Chain-linkage onto an earlier published base (see config/method.yaml).
+    # Disabled leaves the index on its own base period = 100.
+    linkage = payload.get("linkage") or {}
+    link_on = bool(linkage.get("enabled"))
+    link_factor = Decimal(str(linkage["link_factor"])) if link_on else None
+    link_label = linkage.get("label") if link_on else None
     return MethodConfig(
         method_version=str(payload.get("method_version", "1.0.0")),
         apw_windows=tuple(int(item) for item in payload.get("apw_windows", (1, 7, 15, 30, 45))),
@@ -51,6 +57,9 @@ def load_method_config(settings: Settings | None = None, *, omega_preset: str | 
         basis=payload.get("basis", "book"),
         apply_availability_adjustment=bool(payload.get("apply_availability_adjustment", True)),
         apply_dow_smoothing=bool(payload.get("apply_dow_smoothing", True)),
+        base_period=payload.get("base_period"),
+        link_factor=link_factor,
+        link_label=link_label,
     )
 
 

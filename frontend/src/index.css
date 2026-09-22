@@ -391,6 +391,16 @@ main {
   color: var(--nu-accent);
 }
 
+/* What the level is measured against. A number this size is read as an
+   absolute, so the base sits with it rather than in a legend elsewhere. */
+.base-note {
+  margin-top: var(--nu-space-3);
+  font-family: var(--nu-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--nu-text-muted);
+}
+
 /* ---------- Tables ---------- */
 
 .table-container {
