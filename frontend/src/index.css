@@ -401,6 +401,85 @@ main {
   color: var(--nu-text-muted);
 }
 
+/* ---------- Tile prose ----------
+   The Methodology and Sources cards use raw h3/p/ul rather than the .muted and
+   .metric classes, so those elements are given the same treatment here instead
+   of falling through to the body font. */
+
+h3 {
+  margin: 0 0 var(--nu-space-3);
+  font-family: var(--nu-font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--nu-text);
+}
+
+.card p {
+  margin: 0 0 var(--nu-space-3);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--nu-text-muted);
+}
+
+.card p:last-child {
+  margin-bottom: 0;
+}
+
+.card p strong,
+.card li strong {
+  color: var(--nu-text);
+  font-weight: 600;
+}
+
+/* Notes lists. The default disc is replaced with a short accent rule: it keeps
+   the list scannable without introducing another shape, and the marks are small
+   enough that the page stays within its accent budget. */
+.card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card li {
+  position: relative;
+  padding-left: var(--nu-space-4);
+  margin-bottom: var(--nu-space-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--nu-text-muted);
+}
+
+.card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 8px;
+  height: 1px;
+  background: var(--nu-accent);
+}
+
+.card li:last-child {
+  margin-bottom: 0;
+}
+
+/* Adapter/circuit rows read as raw state, so they sit in the mono face. */
+.circuit-list li {
+  font-family: var(--nu-font-mono);
+  font-size: 0.8rem;
+}
+
+code {
+  font-family: var(--nu-font-mono);
+  font-size: 0.85em;
+  background: var(--nu-surface-hover);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  color: var(--nu-text);
+}
+
 /* ---------- Tables ---------- */
 
 .table-container {
