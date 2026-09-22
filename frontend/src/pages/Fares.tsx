@@ -48,7 +48,8 @@ export function FaresPage() {
         {items.length === 0 ? (
           <EmptyState title="No fares for this route" body="Run a permitted collection for the selected city-pair." />
         ) : (
-          <table>
+          <div className="table-container">
+            <table>
             <thead>
               <tr>
                 <th>Route</th>
@@ -83,7 +84,8 @@ export function FaresPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </section>

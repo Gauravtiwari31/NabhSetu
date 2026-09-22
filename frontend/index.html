@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href="/nabhsetu_fav.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/ndot55.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/fonts/ntype82_bold.ttf" as="font" type="font/ttf" crossorigin>
     <title>Nabhsetu — Real-Time Airfare Price Index</title>
+    <script>
+      // Apply the saved theme before first paint so dark mode never flashes light.
+      try {
+        if (localStorage.getItem('nabhsetu-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

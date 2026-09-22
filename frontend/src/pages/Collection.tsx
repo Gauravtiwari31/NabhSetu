@@ -120,7 +120,8 @@ export function CollectionPage() {
         {items.length === 0 ? (
           <EmptyState title="No jobs yet" body="Collect a permitted city-pair. Live collection can take up to a minute." />
         ) : (
-          <table>
+          <div className="table-container">
+            <table>
             <thead>
               <tr>
                 <th>When</th>
@@ -151,7 +152,8 @@ export function CollectionPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </section>

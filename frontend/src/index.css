@@ -1,122 +1,795 @@
-:root {
-  font-family: "Segoe UI", system-ui, sans-serif;
-  color: #12263a;
-  background: #eef3f8;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================================================
+   NThing UI — dot-matrix / single-accent design system.
+   Light is the default; dark applies only under [data-theme="dark"], so the
+   first paint never flashes.
+   ========================================================================== */
+
+/* ---------- Display faces ---------- */
+
+@font-face {
+  font-family: "Ndot 55";
+  src: url("/fonts/ndot55.ttf") format("truetype");
+  font-display: swap;
 }
-* { box-sizing: border-box; }
-body { margin: 0; }
-a { color: inherit; text-decoration: none; }
-.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
-.banner {
-  padding: 0.65rem 1.2rem;
+
+@font-face {
+  font-family: "Nothing 5x7";
+  src: url("/fonts/nothing_5_7.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "NType 82";
+  src: url("/fonts/ntype82_bold.ttf") format("truetype");
   font-weight: 700;
-  letter-spacing: 0.02em;
-  text-align: center;
-  font-size: 0.92rem;
+  font-display: swap;
 }
-.banner.mock { background: #f5c451; color: #3b2d00; }
-.banner.live { background: #1f7a4d; color: white; }
-.banner.unavailable { background: #9b1c1c; color: white; }
-.banner.policy_denied { background: #c05621; color: white; }
-.layout { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 42px); }
-nav {
-  background: #0b2545;
-  color: #e8eef7;
-  padding: 1.2rem 1.1rem;
+
+@font-face {
+  font-family: "NType Mono";
+  src: url("/fonts/ntype_mono.otf") format("opentype");
+  font-display: swap;
+}
+
+/* ---------- Tokens ---------- */
+
+:root {
+  /* Fixed palette */
+  --nu-accent: #E2201F;
+  --nu-accent-hover: #F04241;
+  --nu-accent-pressed: #C01B1A;
+  --nu-accent-muted: rgba(226, 32, 31, 0.12);
+  --nu-ink: #1B1C1D;
+  --nu-ink-muted: rgba(27, 28, 29, 0.6);
+  --nu-paper: #F1F0F6;
+  --nu-paper-muted: rgba(241, 240, 246, 0.6);
+  --nu-white: #FFFFFF;
+  --nu-black: #000000;
+  --nu-border-light: rgba(27, 28, 29, 0.1);
+  --nu-border-dark: rgba(241, 240, 246, 0.12);
+
+  /* Radius */
+  --nu-radius: 20px;
+  --nu-radius-sm: 14px;
+  --nu-radius-chip: 999px;
+
+  /* Spacing */
+  --nu-space-1: 4px;
+  --nu-space-2: 8px;
+  --nu-space-3: 12px;
+  --nu-space-4: 16px;
+  --nu-space-5: 24px;
+  --nu-space-6: 32px;
+  --nu-space-7: 48px;
+
+  /* Type */
+  --nu-font-display: "Ndot 55", ui-monospace, monospace;
+  --nu-font-label: "Nothing 5x7", ui-monospace, monospace;
+  --nu-font-heading: "NType 82", "Inter", system-ui, sans-serif;
+  --nu-font-mono: "NType Mono", ui-monospace, Consolas, monospace;
+  --nu-font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Semantic aliases — these are what components reference. */
+  --nu-bg: var(--nu-paper);
+  --nu-surface: var(--nu-white);
+  --nu-surface-hover: rgba(27, 28, 29, 0.03);
+  --nu-text: var(--nu-ink);
+  --nu-text-muted: var(--nu-ink-muted);
+  --nu-border: var(--nu-border-light);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --nu-bg: var(--nu-black);
+  --nu-surface: rgba(255, 255, 255, 0.035);
+  --nu-surface-hover: rgba(255, 255, 255, 0.06);
+  --nu-text: var(--nu-paper);
+  --nu-text-muted: var(--nu-paper-muted);
+  --nu-border: var(--nu-border-dark);
+
+  color-scheme: dark;
+}
+
+/* ---------- Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--nu-font-body);
+  font-size: 15px;
+  color: var(--nu-text);
+  background: var(--nu-bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--nu-accent);
+  color: var(--nu-white);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- App shell ---------- */
+
+.app-shell {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
-.brand { margin-bottom: 1.2rem; }
-.brand-kicker {
-  font-size: 0.72rem;
+
+/* ---------- Status banner ----------
+   Monochrome by default; attention states get the accent, as a hairline rule
+   and a dot rather than a full-bleed red fill. */
+
+.banner {
+  padding: var(--nu-space-3) var(--nu-space-5);
+  font-family: var(--nu-font-heading);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  background: var(--nu-surface);
+  color: var(--nu-text-muted);
+  border-bottom: 1px solid var(--nu-border);
+}
+
+.banner::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  margin-right: var(--nu-space-2);
+  vertical-align: 1px;
+  background: currentColor;
+}
+
+.banner.live {
+  color: var(--nu-text);
+}
+
+.banner.mock,
+.banner.unavailable,
+.banner.policy_denied {
+  color: var(--nu-accent);
+  border-bottom-color: var(--nu-accent);
+}
+
+/* ---------- Navigation ---------- */
+
+.top-nav {
+  background: var(--nu-bg);
+  border-bottom: 1px solid var(--nu-border);
+  padding: var(--nu-space-4) var(--nu-space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nu-space-4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-brand .brand-kicker {
+  font-family: var(--nu-font-label);
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #f59e0b;
+  color: var(--nu-accent);
+}
+
+.nav-brand h1 {
+  margin: 0;
+  font-family: var(--nu-font-heading);
+  font-size: 1.35rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--nu-text);
 }
-nav h1 { margin: 0.15rem 0 0.2rem; font-size: 1.55rem; }
-.brand p { margin: 0; font-size: 0.82rem; opacity: 0.75; line-height: 1.35; }
-nav a { display: block; padding: 0.42rem 0.2rem; opacity: 0.82; border-radius: 6px; }
-nav a.active, nav a:hover { opacity: 1; font-weight: 600; background: rgba(255,255,255,0.06); padding-left: 0.45rem; }
-.nav-foot {
-  margin-top: auto;
-  padding-top: 1.2rem;
+
+.nav-brand p {
+  margin: 0;
   font-size: 0.75rem;
-  opacity: 0.65;
-  line-height: 1.4;
+  color: var(--nu-text-muted);
 }
-main { padding: 1.3rem 1.8rem 2rem; }
-.page-head {
+
+.nav-links {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: flex-end;
-  margin-bottom: 1rem;
-}
-.page-head h2 { margin: 0 0 0.25rem; }
-.page-head label { display: grid; gap: 0.25rem; font-size: 0.8rem; color: #5b6b7c; }
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
-  box-shadow: 0 1px 4px rgba(11, 37, 69, 0.08);
-  margin-bottom: 1rem;
-}
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; }
-.metric { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; }
-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-th, td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid #e4ebf3; }
-tr.row-active { background: #f3f7fc; }
-.clickable-rows tbody tr { cursor: pointer; }
-button, select, input {
-  padding: 0.45rem 0.7rem;
-  border-radius: 8px;
-  border: 1px solid #c9d6e5;
-  background: white;
-}
-button.primary { background: #0b2545; color: white; border: none; cursor: pointer; }
-button.primary:disabled { opacity: 0.55; cursor: not-allowed; }
-.muted { color: #5b6b7c; font-size: 0.9rem; }
-.hash { font-family: ui-monospace, Consolas, monospace; font-size: 0.78rem; word-break: break-all; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
-.toolbar label { display: grid; gap: 0.25rem; font-size: 0.8rem; color: #5b6b7c; }
-.heatmap {
-  display: grid;
-  grid-template-columns: 90px repeat(5, 1fr);
-  gap: 4px;
+  gap: var(--nu-space-1);
   align-items: center;
 }
+
+.nav-links a {
+  padding: var(--nu-space-2) var(--nu-space-3);
+  border-radius: var(--nu-radius-sm);
+  font-family: var(--nu-font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+}
+
+.nav-links a:hover {
+  color: var(--nu-text);
+  background: var(--nu-surface-hover);
+}
+
+.nav-links a.active {
+  color: var(--nu-accent);
+  border-bottom-color: var(--nu-accent);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--nu-text);
+  cursor: pointer;
+  padding: var(--nu-space-2);
+}
+
+/* ---------- Nav actions / theme toggle ---------- */
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nu-space-2);
+  flex: none;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  flex: none;
+  border-radius: var(--nu-radius-sm);
+  border: 1px solid var(--nu-border);
+  background: transparent;
+  color: var(--nu-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--nu-accent);
+  border-color: var(--nu-accent);
+}
+
+/* ---------- Layout ---------- */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+main {
+  padding: var(--nu-space-6);
+  flex: 1;
+  width: 100%;
+}
+
+/* ---------- Page headers ---------- */
+
+.page-head {
+  margin-bottom: var(--nu-space-6);
+}
+
+.page-head h2 {
+  margin: 0 0 var(--nu-space-2);
+  font-family: var(--nu-font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--nu-text);
+}
+
+.page-head p.muted {
+  font-size: 0.95rem;
+  color: var(--nu-text-muted);
+  margin: 0;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ---------- Tile grid ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--nu-space-4);
+  margin-bottom: var(--nu-space-4);
+}
+
+/* ---------- Tiles ---------- */
+
+.card {
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-border);
+  border-radius: var(--nu-radius);
+  padding: var(--nu-space-5);
+  margin-bottom: var(--nu-space-4);
+}
+
+.grid .card {
+  margin-bottom: 0;
+}
+
+/* Tile label — small, uppercase, technical grotesk. */
+.card .muted {
+  font-family: var(--nu-font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+  margin-bottom: var(--nu-space-3);
+}
+
+/* The one hero number per tile. */
+.card .metric {
+  font-family: var(--nu-font-display);
+  font-size: 2.75rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--nu-text);
+  word-break: break-word;
+}
+
+/* A single deliberate accent hit: the first tile of a grid leads. */
+.grid .card:first-child .metric {
+  color: var(--nu-accent);
+}
+
+/* ---------- Tables ---------- */
+
+.table-container {
+  overflow-x: auto;
+  background: var(--nu-surface);
+  border: 1px solid var(--nu-border);
+  border-radius: var(--nu-radius);
+  padding: var(--nu-space-2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: var(--nu-space-3) var(--nu-space-4);
+  border-bottom: 1px solid var(--nu-border);
+}
+
+th {
+  font-family: var(--nu-font-heading);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+td {
+  font-family: var(--nu-font-mono);
+  color: var(--nu-text);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: var(--nu-surface-hover);
+}
+
+tr.row-active {
+  background: var(--nu-accent-muted);
+}
+
+tr.row-active td {
+  color: var(--nu-accent);
+}
+
+.clickable-rows tbody tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+/* ---------- Controls ---------- */
+
+input,
+select,
+button {
+  font-family: var(--nu-font-body);
+  padding: var(--nu-space-2) var(--nu-space-4);
+  border-radius: var(--nu-radius-sm);
+  border: 1px solid var(--nu-border);
+  background: var(--nu-bg);
+  color: var(--nu-text);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+button:focus-visible {
+  outline: none;
+  border-color: var(--nu-accent);
+  box-shadow: 0 0 0 3px var(--nu-accent-muted);
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--nu-font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--nu-accent);
+  color: var(--nu-accent);
+}
+
+button.primary {
+  background: var(--nu-accent);
+  color: var(--nu-white);
+  border: 1px solid var(--nu-accent);
+  padding: var(--nu-space-3) var(--nu-space-5);
+  border-radius: var(--nu-radius-chip);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--nu-accent-hover);
+  border-color: var(--nu-accent-hover);
+  color: var(--nu-white);
+}
+
+button.primary:active:not(:disabled) {
+  background: var(--nu-accent-pressed);
+  border-color: var(--nu-accent-pressed);
+}
+
+button.primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-4);
+  align-items: flex-end;
+}
+
+.toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nu-space-2);
+  font-family: var(--nu-font-heading);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+/* ---------- Heatmap ---------- */
+
+.heatmap {
+  display: grid;
+  grid-template-columns: 100px repeat(5, 1fr);
+  gap: var(--nu-space-2);
+  align-items: center;
+}
+
+.heatmap strong {
+  font-family: var(--nu-font-heading);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nu-text-muted);
+}
+
+/* Cell tint is driven by --heat (0–1), set per cell in the markup, so the
+   ramp follows the active theme instead of a baked-in colour. */
 .heat-cell {
-  min-height: 36px;
-  border-radius: 6px;
+  min-height: 44px;
+  border-radius: var(--nu-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0b2545;
-  font-size: 0.8rem;
+  font-family: var(--nu-font-label);
+  font-size: 0.85rem;
+  background: rgba(226, 32, 31, calc(0.06 + var(--heat, 0) * 0.74));
+  color: var(--nu-text);
+  transition: transform 0.15s ease;
 }
-.empty { padding: 2rem 1rem; text-align: center; color: #5b6b7c; }
-.empty strong { display: block; color: #12263a; font-size: 1.05rem; margin-bottom: 0.4rem; }
+
+.heat-cell[data-hot="true"] {
+  color: var(--nu-white);
+}
+
+.heat-cell:hover {
+  transform: scale(1.04);
+}
+
+/* ---------- Empty state ---------- */
+
+.empty {
+  padding: var(--nu-space-7) var(--nu-space-6);
+  text-align: center;
+  color: var(--nu-text-muted);
+  background: transparent;
+  border: 1px dashed var(--nu-border);
+  border-radius: var(--nu-radius);
+}
+
+.empty strong {
+  display: block;
+  font-family: var(--nu-font-heading);
+  color: var(--nu-text);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--nu-space-3);
+}
+
+.empty p {
+  margin: 0 auto;
+  max-width: 460px;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+/* ---------- Chips ----------
+   Monochrome outline by default; states that need attention take the accent.
+   The label text carries the meaning, so colour is never the only signal. */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nu-space-2);
+  margin: var(--nu-space-3) 0;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  padding: 0.12rem 0.55rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: lowercase;
+  gap: var(--nu-space-2);
+  border-radius: var(--nu-radius-chip);
+  padding: var(--nu-space-1) var(--nu-space-3);
+  font-family: var(--nu-font-heading);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--nu-border);
+  background: transparent;
+  color: var(--nu-text-muted);
 }
-.chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.6rem 0; }
-.chip-ok { background: #eaf8ef; color: #166534; }
-.chip-warn { background: #fff6e5; color: #92400e; }
-.chip-bad { background: #fdecec; color: #991b1b; }
-.chip-neutral { background: #eef4fa; color: #334155; }
-.chip-live { background: #eaf8ef; color: #166534; }
-.chip-mock { background: #fff6e5; color: #92400e; }
-.circuit-list { padding-left: 1.1rem; }
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  nav { flex-direction: row; flex-wrap: wrap; gap: 0.4rem 0.8rem; }
-  .brand { width: 100%; margin-bottom: 0.4rem; }
-  .nav-foot { display: none; }
+
+.chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.chip-ok,
+.chip-live {
+  color: var(--nu-text);
+  border-color: var(--nu-border);
+}
+
+.chip-warn,
+.chip-mock,
+.chip-bad {
+  color: var(--nu-accent);
+  border-color: var(--nu-accent);
+  background: var(--nu-accent-muted);
+}
+
+.chip-neutral {
+  color: var(--nu-text-muted);
+}
+
+/* ---------- Monospace metadata ---------- */
+
+.hash {
+  font-family: var(--nu-font-mono);
+  font-size: 0.8rem;
+  word-break: break-all;
+  background: var(--nu-surface-hover);
+  padding: var(--nu-space-1) var(--nu-space-2);
+  border-radius: 6px;
+}
+
+/* ---------- Hero ---------- */
+
+.hero-section {
+  padding: var(--nu-space-6) 0 var(--nu-space-7);
+  border-bottom: 1px solid var(--nu-border);
+  margin-bottom: var(--nu-space-6);
+}
+
+.hero-content {
+  max-width: 900px;
+}
+
+.hero-content h1 {
+  font-family: var(--nu-font-heading);
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--nu-text);
+  margin: 0 0 var(--nu-space-5);
+}
+
+/* The hero's single accent hit. */
+.hero-content h1 span {
+  color: var(--nu-accent);
+}
+
+.hero-content p {
+  font-family: var(--nu-font-body);
+  font-size: 1rem;
+  color: var(--nu-text-muted);
+  line-height: 1.65;
+  margin-bottom: var(--nu-space-6);
+  max-width: 62ch;
+}
+
+/* ---------- Recharts ----------
+   Charts inherit theme tokens so they flip with the toggle. */
+
+.recharts-cartesian-grid line {
+  stroke: var(--nu-border);
+}
+
+.recharts-cartesian-axis-tick text {
+  fill: var(--nu-text-muted);
+  font-family: var(--nu-font-mono);
+  font-size: 11px;
+}
+
+.recharts-legend-item-text {
+  color: var(--nu-text-muted) !important;
+  font-family: var(--nu-font-heading);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.recharts-default-tooltip {
+  background: var(--nu-surface) !important;
+  border: 1px solid var(--nu-border) !important;
+  border-radius: var(--nu-radius-sm) !important;
+  font-family: var(--nu-font-mono) !important;
+  font-size: 12px !important;
+  color: var(--nu-text) !important;
+}
+
+[data-theme="dark"] .recharts-default-tooltip {
+  background: #111 !important;
+}
+
+.recharts-tooltip-label,
+.recharts-tooltip-item {
+  color: var(--nu-text) !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1200px) {
+  .nav-links a {
+    padding: var(--nu-space-2);
+    font-size: 0.68rem;
+    gap: var(--nu-space-1);
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding: var(--nu-space-5) 0 var(--nu-space-6);
+  }
+  .top-nav {
+    padding: var(--nu-space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--nu-bg);
+    border-bottom: 1px solid var(--nu-border);
+    padding: var(--nu-space-4);
+    gap: var(--nu-space-1);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a.active {
+    border-bottom-color: transparent;
+    background: var(--nu-accent-muted);
+    border-radius: var(--nu-radius-sm);
+  }
+
+  .mobile-nav-toggle {
+    display: block;
+  }
+
+  main {
+    padding: var(--nu-space-4);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-head h2 {
+    font-size: 1.5rem;
+  }
 }

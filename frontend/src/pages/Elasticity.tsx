@@ -16,7 +16,7 @@ export function ElasticityPage() {
         <div>
           <h2>Lead-time elasticity</h2>
           <p className="muted">
-            Log-log elasticity of Nabhsetu-T across official T+ windows. Negative values mean cheaper fares further from
+            Log-log elasticity of APIx-T across official T+ windows. Negative values mean cheaper fares further from
             departure.
           </p>
         </div>
@@ -25,7 +25,8 @@ export function ElasticityPage() {
         {items.length === 0 ? (
           <EmptyState title="No elasticity yet" body="Elasticity appears after more than one published lead window." />
         ) : (
-          <table>
+          <div className="table-container">
+            <table>
             <thead>
               <tr>
                 <th>Period</th>
@@ -49,7 +50,8 @@ export function ElasticityPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </section>

@@ -36,7 +36,7 @@ export function MethodologyPage() {
       <div className="grid">
         <div className="card">
           <h3>
-            Nabhsetu-{method?.variant ?? "T"} · {method?.basis ?? "book"}
+            APIx-{method?.variant ?? "T"} · {method?.basis ?? "book"}
           </h3>
           <p>
             Omega preset <strong>{method?.omega_preset ?? "—"}</strong> · n_min {method?.n_min ?? "—"}
@@ -62,7 +62,8 @@ export function MethodologyPage() {
       </div>
       <div className="card">
         <h3>Route weights ({weightData?.source ?? "declared"})</h3>
-        <table>
+        <div className="table-container">
+          <table>
           <thead>
             <tr>
               <th>Route</th>
@@ -77,7 +78,8 @@ export function MethodologyPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
       <div className="card">
         <h3>Latest publication hashes</h3>

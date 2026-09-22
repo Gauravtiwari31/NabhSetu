@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api";
 import { EmptyState } from "../components/EmptyState";
@@ -53,10 +54,8 @@ export function HeatmapPage() {
                   <div
                     key={`${route}-${window}`}
                     className="heat-cell"
-                    style={{
-                      background: `rgba(11, 37, 69, ${0.12 + intensity * 0.55})`,
-                      color: intensity > 0.5 ? "white" : "#0b2545",
-                    }}
+                    data-hot={intensity > 0.5}
+                    style={{ "--heat": intensity } as CSSProperties}
                   >
                     {cell?.suppressed ? "suppressed" : value == null ? "—" : formatIndex(value, 1)}
                   </div>

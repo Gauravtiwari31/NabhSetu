@@ -56,7 +56,8 @@ export function SourcesPage() {
         {items.length === 0 ? (
           <EmptyState title="No sources seeded" body="Start the API so the catalog can seed airline and OTA profiles." />
         ) : (
-          <table className="clickable-rows">
+          <div className="table-container">
+            <table className="clickable-rows">
             <thead>
               <tr>
                 <th>Source</th>
@@ -85,7 +86,8 @@ export function SourcesPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
       {detail ? (
